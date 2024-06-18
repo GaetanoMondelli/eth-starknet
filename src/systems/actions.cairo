@@ -1,13 +1,9 @@
-use dojo_starter::models::moves::Direction;
-use dojo_starter::models::position::Position;
-use dojo_starter::models::board::ChessBoard; 
-// use dojo_starter::models::piece::ChessBoard;
+use dojo_starter::models::board::Board;
 
 // define the interface
 #[dojo::interface]
 trait IActions {
     fn spawn(ref world: IWorldDispatcher);
-    // fn move(ref world: IWorldDispatcher, direction: Direction);
 }
 
 // dojo decorator
@@ -17,10 +13,7 @@ mod actions {
     use super::{IActions};
     use starknet::{ContractAddress, get_caller_address};
     use dojo_starter::models::{
-        position::{Position, Vec2},
-        // moves::{Moves, Direction, 
-        // DirectionsAvailable}
-        // board::ChessBoard
+        board::{Board, Type},
     };
 
     // #[derive(Copy, Drop, Serde)]
@@ -40,16 +33,12 @@ mod actions {
             set!(
                 world,
                 (
-                    Position {
-                        player, vec: Vec2 { x: 0, y: 0 }
+                    Board { 
+                        id: 1,
+                        player,
+                        opponent: player,
+                        turn: false,
                     }
-                    // ChessBoard { id: 1,
-                    //     player,
-                    //     opponent: player,
-                    //     turn: false,
-                    //     // board: [0; 64],
-                    //  }
-                            // directions_available
                 )
             );
         }

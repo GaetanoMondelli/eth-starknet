@@ -1,0 +1,20 @@
+kind = "DojoModel"
+class_hash = "0xe0d2ea20059c89d640eb1e1de3c838138e2ea0364f0d41fc8881172107e137"
+original_class_hash = "0xe0d2ea20059c89d640eb1e1de3c838138e2ea0364f0d41fc8881172107e137"
+abi = "manifests/dev/abis/base/models/dojo_starter_models_board_cell.json"
+name = "dojo_starter::models::board::cell"
+
+[[members]]
+name = "id"
+type = "u64"
+key = true
+
+[[members]]
+name = "fenPos"
+type = "u64"
+key = true
+
+[[members]]
+name = "value"
+type = "Type"
+key = false
