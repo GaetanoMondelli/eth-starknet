@@ -345,11 +345,11 @@
         "type": "core::integer::u64"
       },
       {
-        "name": "player",
+        "name": "white_player",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {
-        "name": "opponent",
+        "name": "black_player",
         "type": "core::starknet::contract_address::ContractAddress"
       },
       {

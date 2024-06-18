@@ -385,10 +385,6 @@
     "name": "dojo_starter::models::board::Cell",
     "members": [
       {
-        "name": "id",
-        "type": "core::integer::u64"
-      },
-      {
         "name": "fenPos",
         "type": "core::integer::u64"
       },

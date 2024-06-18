@@ -3,10 +3,12 @@ use dojo_starter::models::board::{Cell};
 use dojo_starter::models::board::{Type};
 
 
+
 // define the interface
 #[dojo::interface]
 trait IActions {
     fn spawn(ref world: IWorldDispatcher);
+    fn move_piece(ref world: IWorldDispatcher, from: u64, to: u64);
 }
 
 // dojo decorator
@@ -16,7 +18,7 @@ mod actions {
     use super::{IActions};
     use starknet::{ContractAddress, get_caller_address};
     use dojo_starter::models::{
-        board::{Board, Cell, Type},
+        board::{Board, Cell, Type, TypeTrait},
     };
 
     #[abi(embed_v0)]
@@ -29,8 +31,8 @@ mod actions {
                 (
                     Board { 
                         id: 1,
-                        player,
-                        opponent: player,
+                        white_player: player,
+                        black_player: player,
                         turn: false,
                     },
                 )
@@ -79,7 +81,6 @@ mod actions {
                     world,
                     (
                         Cell {
-                            id: i,
                             fenPos: i,
                             value: t_type,
                         },
@@ -87,6 +88,36 @@ mod actions {
                 );
                 i = i + 1;
             };
+        }
+
+        fn move_piece(ref world: IWorldDispatcher, from: u64, to: u64) {            
+            let player = get_caller_address();
+            let board = get!(world, 1, Board);
+            if board.turn == false && player != board.white_player {
+                return ();
+            } else if board.turn == true && player != board.black_player {
+                return ();
+            }
+
+            let mut cell_from = get!(world, from, Cell);
+            let mut cell_to = get!(world, to, Cell);
+
+            // if cell_from.value == Type::Empty {
+            //     return ();
+            // }
+
+            if cell_from.value.is_empty(){
+                return ();
+            }
+
+            if board.turn == false && cell_from.value.is_white() {
+                return ();
+            }
+
+            if board.turn == true && cell_from.value.is_black() {
+                return ();
+            }
+         
         }
     }
 }

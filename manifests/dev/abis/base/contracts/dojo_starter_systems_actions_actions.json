@@ -68,6 +68,22 @@
         "inputs": [],
         "outputs": [],
         "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "move_piece",
+        "inputs": [
+          {
+            "name": "from",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "to",
+            "type": "core::integer::u64"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       }
     ]
   },

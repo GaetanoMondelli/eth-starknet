@@ -1,13 +1,8 @@
 kind = "DojoModel"
-class_hash = "0xe0d2ea20059c89d640eb1e1de3c838138e2ea0364f0d41fc8881172107e137"
-original_class_hash = "0xe0d2ea20059c89d640eb1e1de3c838138e2ea0364f0d41fc8881172107e137"
+class_hash = "0x113c0ab02de1d4dfd5efd2dc20c70e6eb9cb2e602d81451ebcb1b3685a50ee1"
+original_class_hash = "0x113c0ab02de1d4dfd5efd2dc20c70e6eb9cb2e602d81451ebcb1b3685a50ee1"
 abi = "manifests/dev/abis/base/models/dojo_starter_models_board_cell.json"
 name = "dojo_starter::models::board::cell"
-
-[[members]]
-name = "id"
-type = "u64"
-key = true
 
 [[members]]
 name = "fenPos"

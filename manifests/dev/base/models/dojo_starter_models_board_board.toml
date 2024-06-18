@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x1329df4af3e224a31cb6bdfb2d9250dc6b68e696e26891a448fc4ca55fabcc5"
-original_class_hash = "0x1329df4af3e224a31cb6bdfb2d9250dc6b68e696e26891a448fc4ca55fabcc5"
+class_hash = "0x3a8f4245304e4d523b88e5b007f1c8cc9c49f708cd475f8d15f977c8cbd0a1"
+original_class_hash = "0x3a8f4245304e4d523b88e5b007f1c8cc9c49f708cd475f8d15f977c8cbd0a1"
 abi = "manifests/dev/abis/base/models/dojo_starter_models_board_board.json"
 name = "dojo_starter::models::board::board"
 
@@ -10,12 +10,12 @@ type = "u64"
 key = true
 
 [[members]]
-name = "player"
+name = "white_player"
 type = "ContractAddress"
 key = false
 
 [[members]]
-name = "opponent"
+name = "black_player"
 type = "ContractAddress"
 key = false
 
