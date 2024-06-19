@@ -150,6 +150,8 @@ struct Board {
     white_player: ContractAddress,
     black_player: ContractAddress,
     turn: bool,
+    is_finished: bool,
+    winner: ContractAddress,
 }
 
 

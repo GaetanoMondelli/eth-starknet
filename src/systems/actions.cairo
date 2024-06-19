@@ -34,6 +34,8 @@ mod actions {
                         white_player: player,
                         black_player: player,
                         turn: false,
+                        is_finished: false,
+                        winner: player
                     },
                 )
             );
@@ -117,7 +119,81 @@ mod actions {
             if board.turn == true && cell_from.value.is_black() {
                 return ();
             }
-         
+
+            if to > 63 {
+                return ();
+            }
+
+            let toPiece = cell_to.value;
+
+            if cell_from.value.is_pawn() {
+                if cell_from.value.is_white() {
+                    if (to > from) && (to - from) == 8 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else if (to - from) == 16 && cell_from.fenPos < 16 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else {
+                        return ();
+                    }
+                } else {
+                    if (from > to) && (from - to) == 8 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else if (from > to) && (from - to) == 16 && cell_from.fenPos > 47 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else {
+                        return ();
+                    }
+                }
+            } 
+
+
+            if cell_from.value.is_rook() {
+                if (from / 8 == to / 8) || (from % 8 == to % 8) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
+
+            else {
+                cell_to.value = cell_from.value;
+                cell_from.value = Type::Empty;
+            }
+
+
+
+
+            if board.turn == false {
+                set!(world, (
+                    Board {
+                        id: 1,
+                        white_player: board.white_player,
+                        black_player: board.black_player,
+                        turn: true,
+                        is_finished: toPiece.is_king(),
+                        winner: player,
+                    },
+                 cell_from, cell_to));
+            } else {
+                set!(world, (
+                    Board {
+                        id: 1,
+                        white_player: board.white_player,
+                        black_player: board.black_player,
+                        turn: false,
+                        is_finished: toPiece.is_king(),
+                        winner: player,
+                    },
+                 cell_from, cell_to));
+            }
+
+
+
         }
     }
 }

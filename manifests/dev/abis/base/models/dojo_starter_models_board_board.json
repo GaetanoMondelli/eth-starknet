@@ -355,6 +355,14 @@
       {
         "name": "turn",
         "type": "core::bool"
+      },
+      {
+        "name": "is_finished",
+        "type": "core::bool"
+      },
+      {
+        "name": "winner",
+        "type": "core::starknet::contract_address::ContractAddress"
       }
     ]
   },

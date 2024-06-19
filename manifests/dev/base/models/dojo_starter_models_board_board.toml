@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x3a8f4245304e4d523b88e5b007f1c8cc9c49f708cd475f8d15f977c8cbd0a1"
-original_class_hash = "0x3a8f4245304e4d523b88e5b007f1c8cc9c49f708cd475f8d15f977c8cbd0a1"
+class_hash = "0x31820b400b0a977c4008608f10560a116b50961717cd5405d5b505385bae33d"
+original_class_hash = "0x31820b400b0a977c4008608f10560a116b50961717cd5405d5b505385bae33d"
 abi = "manifests/dev/abis/base/models/dojo_starter_models_board_board.json"
 name = "dojo_starter::models::board::board"
 
@@ -22,4 +22,14 @@ key = false
 [[members]]
 name = "turn"
 type = "bool"
+key = false
+
+[[members]]
+name = "is_finished"
+type = "bool"
+key = false
+
+[[members]]
+name = "winner"
+type = "ContractAddress"
 key = false
