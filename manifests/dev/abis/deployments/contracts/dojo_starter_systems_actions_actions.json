@@ -59,32 +59,6 @@
     "interface_name": "dojo_starter::systems::actions::IActions"
   },
   {
-    "type": "enum",
-    "name": "dojo_starter::models::moves::Direction",
-    "variants": [
-      {
-        "name": "None",
-        "type": "()"
-      },
-      {
-        "name": "Left",
-        "type": "()"
-      },
-      {
-        "name": "Right",
-        "type": "()"
-      },
-      {
-        "name": "Up",
-        "type": "()"
-      },
-      {
-        "name": "Down",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "interface",
     "name": "dojo_starter::systems::actions::IActions",
     "items": [
@@ -97,11 +71,15 @@
       },
       {
         "type": "function",
-        "name": "move",
+        "name": "move_piece",
         "inputs": [
           {
-            "name": "direction",
-            "type": "dojo_starter::models::moves::Direction"
+            "name": "from",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "to",
+            "type": "core::integer::u64"
           }
         ],
         "outputs": [],

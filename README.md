@@ -40,3 +40,10 @@ This starter project is a constant work in progress and contributions are greatl
    - It can't get better then this, your pull request will be appreciated by the community.
 
 Happy coding!
+
+
+🎉 Successfully migrated World on block #3 at address 0xb4079627ebab1cd3cf9fd075dda1ad2454a7a448bf659591f259efa2519b18
+
+
+katana --disable-fee --allowed-origins "*"
+torii  --world 0xb4079627ebab1cd3cf9fd075dda1ad2454a7a448bf659591f259efa2519b18 --allowed-origins "*'
