@@ -194,6 +194,19 @@ mod actions {
                     cell_to.value = cell_from.value;
                     cell_from.value = Type::Empty;
                 } else {
+                    // !!! check the inverse diagonal works
+                    return ();
+                }
+            }
+
+            if cell_from.value.is_king() {
+                if (from / 8 == to / 8 && (from % 8 == to % 8 + 1 || from % 8 == to % 8 - 1)) 
+                    || (from % 8 == to % 8 && (from / 8 == to / 8 + 1 || from / 8 == to / 8 - 1)) 
+                    || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8) && (from / 8 - to / 8 == 1 || from % 8 - to % 8 == 1)) 
+                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8) && (to / 8 - from / 8 == 1 || to % 8 - from % 8 == 1)) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
                     return ();
                 }
             }
@@ -204,9 +217,6 @@ mod actions {
                 cell_to.value = cell_from.value;
                 cell_from.value = Type::Empty;
             }
-
-
-
 
             if board.turn == false {
                 set!(world, (
