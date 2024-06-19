@@ -8,13 +8,29 @@ import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 
+function chessPositionToIndex(pos) {
+  // Extract the column (letter) and row (number)
+  const column = pos.charAt(0);
+  const row = pos.charAt(1);
+
+  // Convert column letter to index (a=0, b=1, ..., h=7)
+  const columnIndex = column.charCodeAt(0) - "a".charCodeAt(0);
+
+  // Convert row number to index (1=7, 2=6, ..., 8=0)
+  const rowIndex = 8 - parseInt(row);
+
+  // Calculate the position in the array
+  const index = rowIndex * 8 + columnIndex;
+
+  return index;
+}
+
 function convertCustomFenToStandard(customFen: string) {
   // Split the custom FEN string into rows
   const rows = [];
   for (let i = 0; i < 8; i++) {
     rows.push(customFen.slice(i * 8, (i + 1) * 8));
   }
-
   // Function to convert a single row to standard FEN
   function convertRow(row: string) {
     let fenRow = "";
@@ -142,6 +158,14 @@ function App() {
             <div>Board Registered</div>
             <button
               onClick={async () => {
+                await client.actions.spawn({ account });
+              }}
+            >
+              spawn
+            </button>
+            <br></br>
+            <button
+              onClick={async () => {
                 setFetch(true);
                 setTimeout(() => {
                   setFetch(false);
@@ -184,9 +208,24 @@ function App() {
             to: to,
             promotion: "q",
           });
-
+        
           if (move === null) return false;
           console.log("move", from, to);
+          console.log("move", chessPositionToIndex(from), chessPositionToIndex(to));
+          setGamePos(game.fen());
+        
+          // Handle the async call within a thenable chain
+          client.actions.move_piece({
+            account,
+            from: chessPositionToIndex(from),
+            to: chessPositionToIndex(to),
+          })
+          .then((res) => {
+            console.log("Piece moved successfully", res);
+          })
+          .catch((error) => {
+            console.error("Error moving piece:", error);
+          });
           setGamePos(game.fen());
           return true;
         }}

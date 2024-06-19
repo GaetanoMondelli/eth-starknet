@@ -102,119 +102,121 @@ mod actions {
             let mut cell_from = get!(world, from, Cell);
             let mut cell_to = get!(world, to, Cell);
 
-            // if cell_from.value == Type::Empty {
+
+            // if cell_from.value.is_empty(){
             //     return ();
             // }
 
-            if cell_from.value.is_empty(){
-                return ();
-            }
+            // if board.turn == false && cell_from.value.is_white() {
+            //     return ();
+            // }
 
-            if board.turn == false && cell_from.value.is_white() {
-                return ();
-            }
+            // if board.turn == true && cell_from.value.is_black() {
+            //     return ();
+            // }
 
-            if board.turn == true && cell_from.value.is_black() {
-                return ();
-            }
-
-            if to > 63 {
-                return ();
-            }
+            // if to > 63 {
+            //     return ();
+            // }
 
             let toPiece = cell_to.value;
 
-            if cell_from.value.is_pawn() {
-                if cell_from.value.is_white() {
-                    if (to > from) && (to - from) == 8 {
-                        cell_to.value = cell_from.value;
-                        cell_from.value = Type::Empty;
-                    } else if (to - from) == 16 && cell_from.fenPos < 16 {
-                        cell_to.value = cell_from.value;
-                        cell_from.value = Type::Empty;
-                    } else {
-                        return ();
-                    }
-                } else {
-                    if (from > to) && (from - to) == 8 {
-                        cell_to.value = cell_from.value;
-                        cell_from.value = Type::Empty;
-                    } else if (from > to) && (from - to) == 16 && cell_from.fenPos > 47 {
-                        cell_to.value = cell_from.value;
-                        cell_from.value = Type::Empty;
-                    } else {
-                        return ();
-                    }
-                }
-            } 
+            // if cell_from.value.is_pawn() {
+            //     if cell_from.value.is_white() {
+            //         if (to > from) && (to - from) == 8 {
+            //             cell_to.value = cell_from.value;
+            //             cell_from.value = Type::Empty;
+            //         } else if (to - from) == 16 && cell_from.fenPos < 16 {
+            //             cell_to.value = cell_from.value;
+            //             cell_from.value = Type::Empty;
+            //         } else {
+            //             return ();
+            //         }
+            //     } else {
+            //         if (from > to) && (from - to) == 8 {
+            //             cell_to.value = cell_from.value;
+            //             cell_from.value = Type::Empty;
+            //         } else if (from > to) && (from - to) == 16 && cell_from.fenPos > 47 {
+            //             cell_to.value = cell_from.value;
+            //             cell_from.value = Type::Empty;
+            //         } else {
+            //             return ();
+            //         }
+            //     }
+            // } 
 
-            if cell_from.value.is_rook() {
-                if (from / 8 == to / 8) || (from % 8 == to % 8) {
-                    cell_to.value = cell_from.value;
-                    cell_from.value = Type::Empty;
-                } else {
-                    return ();
-                }
-            }
+            // if cell_from.value.is_rook() {
+            //     if (from / 8 == to / 8) || (from % 8 == to % 8) {
+            //         cell_to.value = cell_from.value;
+            //         cell_from.value = Type::Empty;
+            //     } else {
+            //         return ();
+            //     }
+            // }
 
-            if cell_from.value.is_bishop() {
-                if (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
-                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
-                    cell_to.value = cell_from.value;
-                    cell_from.value = Type::Empty;
-                } else {
-                    return ();
-                }
-            }
-
-
-            if cell_from.value.is_knight() {
-                if (from / 8 == to / 8 + 2 && from % 8 == to % 8 + 1) 
-                    || (from / 8 == to / 8 + 2 && from % 8 == to % 8 - 1) 
-                    || (from / 8 == to / 8 - 2 && from % 8 == to % 8 + 1) 
-                    || (from / 8 == to / 8 - 2 && from % 8 == to % 8 - 1) 
-                    || (from / 8 == to / 8 + 1 && from % 8 == to % 8 + 2) 
-                    || (from / 8 == to / 8 + 1 && from % 8 == to % 8 - 2) 
-                    || (from / 8 == to / 8 - 1 && from % 8 == to % 8 + 2) 
-                    || (from / 8 == to / 8 - 1 && from % 8 == to % 8 - 2) {
-                    cell_to.value = cell_from.value;
-                    cell_from.value = Type::Empty;
-                } else {
-                    return ();
-                }
-            }
+            // if cell_from.value.is_bishop() {
+            //     if (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
+            //         || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
+            //         cell_to.value = cell_from.value;
+            //         cell_from.value = Type::Empty;
+            //     } else {
+            //         return ();
+            //     }
+            // }
 
 
-            if cell_from.value.is_queen() {
-                if (from / 8 == to / 8) || (from % 8 == to % 8) 
-                    || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
-                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
-                    cell_to.value = cell_from.value;
-                    cell_from.value = Type::Empty;
-                } else {
-                    // !!! check the inverse diagonal works
-                    return ();
-                }
-            }
-
-            if cell_from.value.is_king() {
-                if (from / 8 == to / 8 && (from % 8 == to % 8 + 1 || from % 8 == to % 8 - 1)) 
-                    || (from % 8 == to % 8 && (from / 8 == to / 8 + 1 || from / 8 == to / 8 - 1)) 
-                    || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8) && (from / 8 - to / 8 == 1 || from % 8 - to % 8 == 1)) 
-                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8) && (to / 8 - from / 8 == 1 || to % 8 - from % 8 == 1)) {
-                    cell_to.value = cell_from.value;
-                    cell_from.value = Type::Empty;
-                } else {
-                    return ();
-                }
-            }
+            // if cell_from.value.is_knight() {
+            //     if (from / 8 == to / 8 + 2 && from % 8 == to % 8 + 1) 
+            //         || (from / 8 == to / 8 + 2 && from % 8 == to % 8 - 1) 
+            //         || (from / 8 == to / 8 - 2 && from % 8 == to % 8 + 1) 
+            //         || (from / 8 == to / 8 - 2 && from % 8 == to % 8 - 1) 
+            //         || (from / 8 == to / 8 + 1 && from % 8 == to % 8 + 2) 
+            //         || (from / 8 == to / 8 + 1 && from % 8 == to % 8 - 2) 
+            //         || (from / 8 == to / 8 - 1 && from % 8 == to % 8 + 2) 
+            //         || (from / 8 == to / 8 - 1 && from % 8 == to % 8 - 2) {
+            //         cell_to.value = cell_from.value;
+            //         cell_from.value = Type::Empty;
+            //     } else {
+            //         return ();
+            //     }
+            // }
 
 
+            // if cell_from.value.is_queen() {
+            //     if (from / 8 == to / 8) || (from % 8 == to % 8) 
+            //         || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
+            //         || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
+            //         cell_to.value = cell_from.value;
+            //         cell_from.value = Type::Empty;
+            //     } else {
+            //         // !!! check the inverse diagonal works
+            //         return ();
+            //     }
+            // }
 
-            else {
-                cell_to.value = cell_from.value;
-                cell_from.value = Type::Empty;
-            }
+            // if cell_from.value.is_king() {
+            //     if (from / 8 == to / 8 && (from % 8 == to % 8 + 1 || from % 8 == to % 8 - 1)) 
+            //         || (from % 8 == to % 8 && (from / 8 == to / 8 + 1 || from / 8 == to / 8 - 1)) 
+            //         || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8) && (from / 8 - to / 8 == 1 || from % 8 - to % 8 == 1)) 
+            //         || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8) && (to / 8 - from / 8 == 1 || to % 8 - from % 8 == 1)) {
+            //         cell_to.value = cell_from.value;
+            //         cell_from.value = Type::Empty;
+            //     } else {
+            //         return ();
+            //     }
+            // }
+
+
+
+            // else {
+            //     cell_to.value = cell_from.value;
+            //     cell_from.value = Type::Empty;
+            // }
+
+            
+            // UNCOMMENT FOR REMOVING CONSTRAINTS
+            cell_to.value = cell_from.value;
+            cell_from.value = Type::Empty;
 
             if board.turn == false {
                 set!(world, (
