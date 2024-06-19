@@ -187,6 +187,18 @@ mod actions {
             }
 
 
+            if cell_from.value.is_queen() {
+                if (from / 8 == to / 8) || (from % 8 == to % 8) 
+                    || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
+                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
+
+
 
             else {
                 cell_to.value = cell_from.value;
