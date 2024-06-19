@@ -14,7 +14,7 @@ trait TypeTrait {
 
 #[derive(Serde, Copy, Drop, Introspect, PartialEq)]
 enum Type {
-    Empty, // empty square
+    Empty,
     pawn,
     rook,
     knight,
@@ -153,5 +153,4 @@ struct Board {
     is_finished: bool,
     winner: ContractAddress,
 }
-
 

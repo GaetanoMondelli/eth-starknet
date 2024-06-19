@@ -9,11 +9,13 @@ export async function setupWorld(provider: DojoProvider) {
   function actions() {
     const spawn = async ({ account }: { account: AccountInterface }) => {
       try {
-        return await provider.execute(account, {
+        const res = await provider.execute(account, {
           contractName: "actions",
           entrypoint: "spawn",
           calldata: [],
         });
+        console.log("spawned", res);
+        return res;
       } catch (error) {
         console.error("Error executing spawn:", error);
         throw error;

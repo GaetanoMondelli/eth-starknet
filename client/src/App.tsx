@@ -1,90 +1,90 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { useDojo } from "./dojo/useDojo";
 import { useComponentValue, useEntityQuery } from "@dojoengine/react";
+import { Chessboard } from "react-chessboard";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
-import { shortString } from "starknet";
+// import { shortString } from "starknet";
 import { Has, HasValue } from "@dojoengine/recs";
+import { Chess } from "chess.js";
 
-function Cell({ x, y, color }: { x: number; y: number; color: string }) {
+function CellBoard({ fenPos }: { fenPos: number }) {
   const {
     setup: {
-      clientComponents: { Tile },
+      clientComponents: { Cell },
       client,
     },
     account: { account },
   } = useDojo();
 
-  const tile = useComponentValue(
-    Tile,
-    getEntityIdFromKeys([BigInt(x), BigInt(y)]),
-    {
-      x,
-      y,
-      color: BigInt(shortString.encodeShortString("white")),
-    }
-  );
+  const cell = useComponentValue(Cell, getEntityIdFromKeys([BigInt(fenPos)]), {
+    fenPos: fenPos,
+    value: "-",
+  });
 
-  return (
-    <div
-      onClick={async () => {
-        await client.actions.paint({
-          account,
-          x,
-          y,
-          color: BigInt(shortString.encodeShortString(color)),
-        });
-      }}
-      className={`w-12 cursor-pointer duration-300 hover:bg-${color}-100 h-12 border-${color}-100 border-blue-100/10 flex justify-center bg-${shortString.decodeShortString(tile.color.toString())}-100`}
-    >
-      <span className="self-center text-black/20">
-        {x},{y}
-      </span>
-    </div>
-  );
+  return cell.value;
+  // <div
+  //   onClick={async () => {
+  //     // await client.actions.paint({
+  //     //   account,
+  //     //   x,
+  //     //   y,
+  //     //   color: BigInt(shortString.encodeShortString(color)),
+  //     // });
+  //   }}
+  //   // className={`w-12 cursor-pointer duration-300 hover:bg-${color}-100 h-12 border-${color}-100 border-blue-100/10 flex justify-center bg-${shortString.decodeShortString(tile.color.toString())}-100`}
+  // >
+  //   <span className="self-center text-black/20">{cell.value}</span>
+  // </div>
+  // );
 }
 
 function App() {
-  // const {
-  //   setup: {
-  //     client,
-  //     clientComponents: { Player },
-  //   },
-  //   account: { account },
-  // } = useDojo();
+  const [game, setGame] = useState(new Chess());
+  const [gamePos, setGamePos] = useState<any>(game.fen());
+
+  const {
+    setup: {
+      client,
+      clientComponents: { Board, Cell },
+    },
+    account: { account },
+  } = useDojo();
 
   // [get] player with recs query
-  // const playerQuery = useEntityQuery([
-  //   Has(Player),
-  //   HasValue(Player, { address: BigInt(account.address) }),
-  // ]);
+  const playerQuery = useEntityQuery([
+    Has(Board),
+    HasValue(Board, { id: 1 }),
+    // BigInt(account.address)
+  ]);
 
-  // const player = useComponentValue(Player, playerQuery[0]);
+  const board = useComponentValue(Board, playerQuery[0]);
 
-  const [color, setColor] = useState<"red" | "blue">("red");
+  const fenRepr = useComponentValue(Cell, getEntityIdFromKeys([BigInt(0)]));
+  let fenString = "-".repeat(64);
+  for (let i = 0; i < 64; i++) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const cell = useComponentValue(Cell, getEntityIdFromKeys([BigInt(i)]));
+    fenString = fenString.slice(0, i) + cell?.value + fenString.slice(i + 1);
+  }
+
+  const [fetch, setFetch] = useState(false);
+  // useState<"red" | "blue">("red");
 
   const grid = useMemo(() => {
-    const tempGrid = [];
-    for (let row = 0; row < 15; row++) {
-      const cols = [];
-      for (let col = 0; col < 15; col++) {
-        cols.push(<Cell key={`${row}-${col}`} x={row} y={col} color={color} />);
-      }
-      tempGrid.push(
-        <div key={row} className="flex flex-wrap">
-          {cols}
-        </div>
-      );
+    const board = [];
+    for (let col = 0; col < 64; col++) {
+      board.push(<CellBoard key={`${col}`} fenPos={col} />);
     }
-    return tempGrid;
-  }, [color]);
+    return board;
+  }, [fetch]);
 
   // console.log(Number(player?.last_action.toString()) || 0);
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl text-center">Dojo Paint</h1>
-      <div className="flex gap-2 justify-center">
+      <h1 className="text-3xl text-center">Degen Zkhess</h1>
+      {/* <div className="flex gap-2 justify-center">
         <button
           className={`px-2 py-1  border border-red-500 ${color === "red" && "bg-red-100"}`}
           onClick={() => setColor("red")}
@@ -97,10 +97,32 @@ function App() {
         >
           blue
         </button>
-      </div>
-      {/* <div className="text-xl py-3">
-        {player?.address ? (
-          <div>Player Registered</div>
+      </div> */}
+      <div className="text-xl py-3">
+        {board?.id ? (
+          <>
+            <div>Board Registered</div>
+            <button
+              onClick={async () => {
+                setFetch(true);
+                setTimeout(() => {
+                  setFetch(false);
+                }, 1000);
+              }}
+            >
+              {fetch ? "fetching" : "fetch"}
+            </button>
+            <pre>{JSON.stringify(board, null, 2)}</pre>
+            <pre>{JSON.stringify(gamePos, null, 2)}</pre>
+
+            <div className="grid grid-cols-8 gap-2">
+              {grid.map((cell) => (
+                <div>
+                  <span className="self-center text-black/20">{cell}</span>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <button
             onClick={async () => {
@@ -111,7 +133,28 @@ function App() {
           </button>
         )}
       </div>
-      {player?.address.toString() && <div className="mx-auto p-10">{grid}</div>} */}
+      <Chessboard
+        id="BasicBoard"
+        position={gamePos}
+        // customPieces={customPieces()}
+        onPieceDrop={(from, to) => {
+          const move = game.move({
+            from: from,
+            to: to,
+            promotion: "q",
+          });
+
+          if (move === null) return false;
+
+          setGamePos(game.fen());
+          return true;
+        }}
+        // onPieceClick={onPieceClick}
+        // onSquareClick={onSquareClick}
+        boardWidth={500}
+        customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
+        customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
+      />
     </div>
   );
 }
