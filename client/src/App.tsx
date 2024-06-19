@@ -45,21 +45,21 @@ function Cell({ x, y, color }: { x: number; y: number; color: string }) {
 }
 
 function App() {
-  const {
-    setup: {
-      client,
-      clientComponents: { Player },
-    },
-    account: { account },
-  } = useDojo();
+  // const {
+  //   setup: {
+  //     client,
+  //     clientComponents: { Player },
+  //   },
+  //   account: { account },
+  // } = useDojo();
 
   // [get] player with recs query
-  const playerQuery = useEntityQuery([
-    Has(Player),
-    HasValue(Player, { address: BigInt(account.address) }),
-  ]);
+  // const playerQuery = useEntityQuery([
+  //   Has(Player),
+  //   HasValue(Player, { address: BigInt(account.address) }),
+  // ]);
 
-  const player = useComponentValue(Player, playerQuery[0]);
+  // const player = useComponentValue(Player, playerQuery[0]);
 
   const [color, setColor] = useState<"red" | "blue">("red");
 
@@ -79,7 +79,7 @@ function App() {
     return tempGrid;
   }, [color]);
 
-  console.log(Number(player?.last_action.toString()) || 0);
+  // console.log(Number(player?.last_action.toString()) || 0);
 
   return (
     <div className="container mx-auto">
@@ -98,7 +98,7 @@ function App() {
           blue
         </button>
       </div>
-      <div className="text-xl py-3">
+      {/* <div className="text-xl py-3">
         {player?.address ? (
           <div>Player Registered</div>
         ) : (
@@ -111,7 +111,7 @@ function App() {
           </button>
         )}
       </div>
-      {player?.address.toString() && <div className="mx-auto p-10">{grid}</div>}
+      {player?.address.toString() && <div className="mx-auto p-10">{grid}</div>} */}
     </div>
   );
 }

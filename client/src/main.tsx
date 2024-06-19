@@ -10,10 +10,19 @@ async function init() {
   const rootElement = document.getElementById("root");
   if (!rootElement) throw new Error("React root not found");
   const root = ReactDOM.createRoot(rootElement as HTMLElement);
-
   const setupResult = await setup(dojoConfig);
 
-  !setupResult && <div>loading</div>;
+  // try{
+  //   console.log("setupResult", setupResult);
+  // }
+  // catch(e){
+  //   console.error(e);
+  // }
+
+
+  console.log("setupResult", setupResult);
+
+  // !setupResult && <div>loading</div>;
 
   root.render(
     <React.StrictMode>
