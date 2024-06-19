@@ -115,18 +115,18 @@ impl TypeIntoFelt252 of Into<Type, felt252> {
     fn into(self: Type) -> felt252 {
         match self {
             Type::Empty => 0,
-            Type::PAWN => 1,
-            Type::ROOK => 2,
-            Type::KNIGHT => 3,
-            Type::BISHOP => 4,
-            Type::QUEEN => 5,
-            Type::KING => 6,
-            Type::pawn => 7,
-            Type::rook => 8,
-            Type::knight => 9,
-            Type::bishop => 10,
-            Type::queen => 11,
-            Type::king => 12,
+            Type::pawn => 1,
+            Type::rook => 2,
+            Type::knight => 3,
+            Type::bishop => 4,
+            Type::queen => 5,
+            Type::king => 6,
+            Type::PAWN => 7,
+            Type::ROOK => 8,
+            Type::KNIGHT => 9,
+            Type::BISHOP => 10,
+            Type::QUEEN => 11,
+            Type::KING => 12,
         }
     }
 }

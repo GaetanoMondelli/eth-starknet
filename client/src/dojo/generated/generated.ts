@@ -22,29 +22,28 @@ export async function setupWorld(provider: DojoProvider) {
       }
     };
 
-    const paint = async ({
+    const move_piece = async ({
       account,
-      x,
-      y,
-      color,
+      from,
+      to,
     }: {
       account: AccountInterface;
-      x: number;
-      y: number;
-      color: bigint;
+      from: number;
+      to: number;
     }) => {
       try {
         return await provider.execute(account, {
           contractName: "actions",
-          entrypoint: "paint",
-          calldata: [x, y, color],
+          entrypoint: "move_piece",
+          calldata: [from, to],
         });
       } catch (error) {
         console.error("Error executing move:", error);
         throw error;
       }
     };
-    return { spawn, paint };
+
+    return { spawn, move_piece };
   }
   return {
     actions: actions(),

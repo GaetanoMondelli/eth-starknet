@@ -79,7 +79,7 @@ function CellBoard({ fenPos }: { fenPos: number }) {
 
 function App() {
   const [game, setGame] = useState(new Chess());
-  const [gamePos, setGamePos] = useState<any>(game.fen());
+  const [gamePos, setGamePos] = useState(game.fen());
 
   const {
     setup: {
@@ -186,7 +186,7 @@ function App() {
           });
 
           if (move === null) return false;
-
+          console.log("move", from, to);
           setGamePos(game.fen());
           return true;
         }}

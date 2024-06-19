@@ -19,19 +19,6 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    // Tile: (() => {
-    //   return defineComponent(
-    //     world,
-    //     { x: RecsType.Number, y: RecsType.Number, color: RecsType.BigInt },
-    //     {
-    //       metadata: {
-    //         name: "Tile",
-    //         types: ["u16","u16","felt252"],
-    //         customTypes: [],
-    //       },
-    //     }
-    //   );
-    // })(),
     Cell: (() => {
       return defineComponent(
         world,
