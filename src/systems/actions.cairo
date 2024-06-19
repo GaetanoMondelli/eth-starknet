@@ -169,6 +169,25 @@ mod actions {
                 }
             }
 
+
+            if cell_from.value.is_knight() {
+                if (from / 8 == to / 8 + 2 && from % 8 == to % 8 + 1) 
+                    || (from / 8 == to / 8 + 2 && from % 8 == to % 8 - 1) 
+                    || (from / 8 == to / 8 - 2 && from % 8 == to % 8 + 1) 
+                    || (from / 8 == to / 8 - 2 && from % 8 == to % 8 - 1) 
+                    || (from / 8 == to / 8 + 1 && from % 8 == to % 8 + 2) 
+                    || (from / 8 == to / 8 + 1 && from % 8 == to % 8 - 2) 
+                    || (from / 8 == to / 8 - 1 && from % 8 == to % 8 + 2) 
+                    || (from / 8 == to / 8 - 1 && from % 8 == to % 8 - 2) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
+
+
+
             else {
                 cell_to.value = cell_from.value;
                 cell_from.value = Type::Empty;
