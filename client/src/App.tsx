@@ -8,6 +8,44 @@ import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 
+function convertCustomFenToStandard(customFen: string) {
+  // Split the custom FEN string into rows
+  const rows = [];
+  for (let i = 0; i < 8; i++) {
+    rows.push(customFen.slice(i * 8, (i + 1) * 8));
+  }
+
+  // Function to convert a single row to standard FEN
+  function convertRow(row: string) {
+    let fenRow = "";
+    let emptyCount = 0;
+    for (let char of row) {
+      if (char === "E") {
+        emptyCount++;
+      } else {
+        if (emptyCount > 0) {
+          fenRow += emptyCount;
+          emptyCount = 0;
+        }
+        fenRow += char;
+      }
+    }
+    if (emptyCount > 0) {
+      fenRow += emptyCount;
+    }
+    return fenRow;
+  }
+
+  // Convert each row and join them with '/'
+  const fenRows = rows.map(convertRow);
+  let standardFen = fenRows.join("/");
+
+  // Add the remaining FEN information for a starting position
+  standardFen += " w KQkq - 0 1";
+
+  return standardFen;
+}
+
 function CellBoard({ fenPos }: { fenPos: number }) {
   const {
     setup: {
@@ -65,7 +103,7 @@ function App() {
   for (let i = 0; i < 64; i++) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const cell = useComponentValue(Cell, getEntityIdFromKeys([BigInt(i)]));
-    fenString = fenString.slice(0, i) + cell?.value + fenString.slice(i + 1);
+    fenString = fenString.slice(0, i) + cell?.value[0] + fenString.slice(i + 1);
   }
 
   const [fetch, setFetch] = useState(false);
@@ -114,6 +152,9 @@ function App() {
             </button>
             <pre>{JSON.stringify(board, null, 2)}</pre>
             <pre>{JSON.stringify(gamePos, null, 2)}</pre>
+            <pre>
+              {JSON.stringify(convertCustomFenToStandard(fenString), null, 2)}
+            </pre>
 
             <div className="grid grid-cols-8 gap-2">
               {grid.map((cell) => (
@@ -135,7 +176,7 @@ function App() {
       </div>
       <Chessboard
         id="BasicBoard"
-        position={gamePos}
+        position={convertCustomFenToStandard(fenString)}
         // customPieces={customPieces()}
         onPieceDrop={(from, to) => {
           const move = game.move({
