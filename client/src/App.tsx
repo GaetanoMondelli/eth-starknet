@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "./App.css";
 import { useDojo } from "./dojo/useDojo";
 import { useComponentValue, useEntityQuery } from "@dojoengine/react";
@@ -7,6 +7,7 @@ import { getEntityIdFromKeys } from "@dojoengine/utils";
 // import { shortString } from "starknet";
 import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
+import customPieces  from "./components/customPieces";
 
 function chessPositionToIndex(pos) {
   // Extract the column (letter) and row (number)
@@ -77,25 +78,27 @@ function CellBoard({ fenPos }: { fenPos: number }) {
   });
 
   return cell.value;
-  // <div
-  //   onClick={async () => {
-  //     // await client.actions.paint({
-  //     //   account,
-  //     //   x,
-  //     //   y,
-  //     //   color: BigInt(shortString.encodeShortString(color)),
-  //     // });
-  //   }}
-  //   // className={`w-12 cursor-pointer duration-300 hover:bg-${color}-100 h-12 border-${color}-100 border-blue-100/10 flex justify-center bg-${shortString.decodeShortString(tile.color.toString())}-100`}
-  // >
-  //   <span className="self-center text-black/20">{cell.value}</span>
-  // </div>
-  // );
 }
 
 function App() {
   const [game, setGame] = useState(new Chess());
   const [gamePos, setGamePos] = useState(game.fen());
+  const [selectIcon, setSelectedIcon] = useState<string>("");
+  const [selectedPiece, setSelectedPiece] = useState<string>("");
+  const [selectToRide, setSelectToRide] = useState<string>();
+
+  function onPieceClick(piece: any) {
+    console.log('piece shape', piece);
+    setSelectedIcon(piece);
+  }
+
+  function onSquareClick(square: any) {
+    console.log('square', square);
+    // check key inside final object that has value of square and return the key
+    let piece = Object.keys(positions).find(key => positions[key] === square);
+    console.log('piece', piece);
+    setSelectedPiece(piece || '');
+  }
 
   const {
     setup: {
@@ -111,7 +114,7 @@ function App() {
     HasValue(Board, { id: 1 }),
     // BigInt(account.address)
   ]);
-
+  
   const board = useComponentValue(Board, playerQuery[0]);
 
   const fenRepr = useComponentValue(Cell, getEntityIdFromKeys([BigInt(0)]));
@@ -201,36 +204,41 @@ function App() {
       <Chessboard
         id="BasicBoard"
         position={convertCustomFenToStandard(fenString)}
-        // customPieces={customPieces()}
+        customPieces={customPieces(selectIcon, selectedPiece, selectToRide, setSelectToRide)}
         onPieceDrop={(from, to) => {
           const move = game.move({
             from: from,
             to: to,
             promotion: "q",
           });
-        
+
           if (move === null) return false;
           console.log("move", from, to);
-          console.log("move", chessPositionToIndex(from), chessPositionToIndex(to));
+          console.log(
+            "move",
+            chessPositionToIndex(from),
+            chessPositionToIndex(to)
+          );
           setGamePos(game.fen());
-        
+
           // Handle the async call within a thenable chain
-          client.actions.move_piece({
-            account,
-            from: chessPositionToIndex(from),
-            to: chessPositionToIndex(to),
-          })
-          .then((res) => {
-            console.log("Piece moved successfully", res);
-          })
-          .catch((error) => {
-            console.error("Error moving piece:", error);
-          });
+          client.actions
+            .move_piece({
+              account,
+              from: chessPositionToIndex(from),
+              to: chessPositionToIndex(to),
+            })
+            .then((res) => {
+              console.log("Piece moved successfully", res);
+            })
+            .catch((error) => {
+              console.error("Error moving piece:", error);
+            });
           setGamePos(game.fen());
           return true;
         }}
-        // onPieceClick={onPieceClick}
-        // onSquareClick={onSquareClick}
+        onPieceClick={onPieceClick}
+        onSquareClick={onSquareClick}
         boardWidth={500}
         customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
         customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
