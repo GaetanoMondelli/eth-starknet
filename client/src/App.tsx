@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { useDojo } from "./dojo/useDojo";
 import { useComponentValue, useEntityQuery } from "@dojoengine/react";
@@ -7,7 +8,8 @@ import { getEntityIdFromKeys } from "@dojoengine/utils";
 // import { shortString } from "starknet";
 import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
-import customPieces  from "./components/customPieces";
+import customPieces from "./components/customPieces";
+import { boardNotation } from "./utils";
 
 function chessPositionToIndex(pos) {
   // Extract the column (letter) and row (number)
@@ -80,24 +82,100 @@ function CellBoard({ fenPos }: { fenPos: number }) {
   return cell.value;
 }
 
+const query = `
+{
+  cellModels(where: { fenPosGTE: "0", fenPosLTE: "63" }, first: 64) {
+    edges {
+      node {
+        fenPos
+        value
+        entity {
+          id
+          __typename
+        }
+      }
+      cursor
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+`;
+
 function App() {
   const [game, setGame] = useState(new Chess());
-  const [gamePos, setGamePos] = useState(game.fen());
+  const [gamePos, setGamePos] = useState<any>("");
   const [selectIcon, setSelectedIcon] = useState<string>("");
   const [selectedPiece, setSelectedPiece] = useState<string>("");
   const [selectToRide, setSelectToRide] = useState<string>();
+  const [positions, setPositions] = useState(boardNotation);
+  const [tokenBalance, setTokenBalance] = useState<any>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchCells = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors.map((e) => e.message).join(", "));
+      }
+
+      const cells = result.data.cellModels.edges
+        .map((edge: { node: any }) => edge.node)
+        .sort(
+          (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
+        )
+        .map((cell: { value: any }) => cell.value);
+
+      let fenString = "-".repeat(64);
+      for (let i = 0; i < 64; i++) {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        let symbol =
+          cells[i].toLowerCase() === "knight" ? cells[i][1] : cells[i][0];
+        fenString = fenString.slice(0, i) + symbol + fenString.slice(i + 1);
+      }
+      console.log("FETCH-fenString", fenString);
+      return fenString;
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchAndSetGamePos = async () => {
+      const fenString = await fetchCells();
+      setGamePos(convertCustomFenToStandard(fenString || ""));
+    };
+
+    fetchAndSetGamePos();
+  }, []);
 
   function onPieceClick(piece: any) {
-    console.log('piece shape', piece);
+    console.log("piece shape", piece);
     setSelectedIcon(piece);
   }
 
   function onSquareClick(square: any) {
-    console.log('square', square);
+    console.log("square", square);
     // check key inside final object that has value of square and return the key
-    let piece = Object.keys(positions).find(key => positions[key] === square);
-    console.log('piece', piece);
-    setSelectedPiece(piece || '');
+    let piece = Object.keys(positions).find((key) => positions[key] === square);
+    console.log("piece", piece);
+    setSelectedPiece(piece || "");
   }
 
   const {
@@ -109,23 +187,25 @@ function App() {
   } = useDojo();
 
   // [get] player with recs query
-  const playerQuery = useEntityQuery([
-    Has(Board),
-    HasValue(Board, { id: 1 }),
-    // BigInt(account.address)
-  ]);
-  
+  const playerQuery = useEntityQuery(
+    [
+      Has(Board),
+      HasValue(Board, { id: 1 }),
+      // BigInt(account.address)
+    ],
+    { updateOnValueChange: true }
+  );
+
   const board = useComponentValue(Board, playerQuery[0]);
+  // const fenRepr = useComponentValue(Cell, getEntityIdFromKeys([BigInt(0)]));
+  // let fenString = "-".repeat(64);
+  // for (let i = 0; i < 64; i++) {
+  //   // eslint-disable-next-line react-hooks/rules-of-hooks
+  //   const cell = useComponentValue(Cell, getEntityIdFromKeys([BigInt(i)]));
+  //   fenString = fenString.slice(0, i) + cell?.value[0] + fenString.slice(i + 1);
+  // }
 
-  const fenRepr = useComponentValue(Cell, getEntityIdFromKeys([BigInt(0)]));
-  let fenString = "-".repeat(64);
-  for (let i = 0; i < 64; i++) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const cell = useComponentValue(Cell, getEntityIdFromKeys([BigInt(i)]));
-    fenString = fenString.slice(0, i) + cell?.value[0] + fenString.slice(i + 1);
-  }
-
-  const [fetch, setFetch] = useState(false);
+  // const [fetch, setFetch] = useState(false);
   // useState<"red" | "blue">("red");
 
   const grid = useMemo(() => {
@@ -141,24 +221,13 @@ function App() {
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl text-center">Degen Zkhess</h1>
-      {/* <div className="flex gap-2 justify-center">
-        <button
-          className={`px-2 py-1  border border-red-500 ${color === "red" && "bg-red-100"}`}
-          onClick={() => setColor("red")}
-        >
-          red
-        </button>
-        <button
-          className={`px-2 py-1  border border-blue-500 ${color === "blue" && "bg-blue-100"}`}
-          onClick={() => setColor("blue")}
-        >
-          blue
-        </button>
-      </div> */}
+
       <div className="text-xl py-3">
-        {board?.id ? (
+        {board?.id && (
           <>
             <div>Board Registered</div>
+            <div>Turn {board.turn ? "black" : "white"}</div>
+            <div>Move {loading ? "loading" : "not loading"}</div>
             <button
               onClick={async () => {
                 await client.actions.spawn({ account });
@@ -167,82 +236,80 @@ function App() {
               spawn
             </button>
             <br></br>
-            <button
-              onClick={async () => {
-                setFetch(true);
-                setTimeout(() => {
-                  setFetch(false);
-                }, 1000);
-              }}
-            >
-              {fetch ? "fetching" : "fetch"}
-            </button>
-            <pre>{JSON.stringify(board, null, 2)}</pre>
-            <pre>{JSON.stringify(gamePos, null, 2)}</pre>
-            <pre>
-              {JSON.stringify(convertCustomFenToStandard(fenString), null, 2)}
-            </pre>
-
-            <div className="grid grid-cols-8 gap-2">
-              {grid.map((cell) => (
-                <div>
-                  <span className="self-center text-black/20">{cell}</span>
-                </div>
-              ))}
-            </div>
           </>
-        ) : (
-          <button
-            onClick={async () => {
-              await client.actions.spawn({ account });
-            }}
+        )}
+
+        {gamePos && (
+          <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+          }}
           >
-            spawn
-          </button>
+          <Chessboard
+            customBoardStyle={
+              {
+                border: "1px solid #000",
+                margin: "0 auto",
+                borderRadius: "10px",
+              }
+            }
+            id="BasicBoard"
+            boardWidth={900}
+            position={
+              loading ? "" : gamePos
+            }
+            customPieces={customPieces(
+              selectIcon,
+              selectedPiece,
+              selectToRide,
+              setSelectToRide,
+              tokenBalance
+            )}
+            onPieceDrop={(from, to) => {
+              console.log("move", from, to);
+              console.log(
+                "move",
+                chessPositionToIndex(from),
+                chessPositionToIndex(to)
+              );
+
+              client.actions
+                .move_piece({
+                  account,
+                  from: chessPositionToIndex(from),
+                  to: chessPositionToIndex(to),
+                })
+                .then(async (res) => {
+                  console.log("Piece moved successfully", res);
+                  setLoading(true);
+                  // Delay before fetching cells
+                  setTimeout(async () => {
+                    const fenString = await fetchCells();
+                    console.log(
+                      "fenString",
+                      convertCustomFenToStandard(fenString || "")
+                    );
+                    setGamePos(convertCustomFenToStandard(fenString || ""));
+                    setLoading(false);
+                  }, 800);
+                })
+                .catch((error) => {
+                  console.error("Error moving piece:", error);
+                });
+
+              return true;
+            }}
+            onPieceClick={onPieceClick}
+            onSquareClick={onSquareClick}
+            boardWidth={500}
+            customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
+            customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
+          />
+          </div>
         )}
       </div>
-      <Chessboard
-        id="BasicBoard"
-        position={convertCustomFenToStandard(fenString)}
-        customPieces={customPieces(selectIcon, selectedPiece, selectToRide, setSelectToRide)}
-        onPieceDrop={(from, to) => {
-          const move = game.move({
-            from: from,
-            to: to,
-            promotion: "q",
-          });
-
-          if (move === null) return false;
-          console.log("move", from, to);
-          console.log(
-            "move",
-            chessPositionToIndex(from),
-            chessPositionToIndex(to)
-          );
-          setGamePos(game.fen());
-
-          // Handle the async call within a thenable chain
-          client.actions
-            .move_piece({
-              account,
-              from: chessPositionToIndex(from),
-              to: chessPositionToIndex(to),
-            })
-            .then((res) => {
-              console.log("Piece moved successfully", res);
-            })
-            .catch((error) => {
-              console.error("Error moving piece:", error);
-            });
-          setGamePos(game.fen());
-          return true;
-        }}
-        onPieceClick={onPieceClick}
-        onSquareClick={onSquareClick}
-        boardWidth={500}
-        customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
-        customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
-      />
     </div>
   );
 }
