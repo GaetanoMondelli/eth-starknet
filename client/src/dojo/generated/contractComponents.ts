@@ -22,11 +22,11 @@ export function defineContractComponents(world: World) {
     Cell: (() => {
       return defineComponent(
         world,
-        { fenPos: RecsType.Number, value: RecsType.String },
+        { fenPos: RecsType.Number, value: RecsType.String, nftRideId: RecsType.Number, tokenQuantity: RecsType.Number },
         {
           metadata: {
             name: "Cell",
-            types: ["u64","Type"],
+            types: ["u64","Type","u64", "u64"],
             customTypes: [],
           },
         }
@@ -35,11 +35,11 @@ export function defineContractComponents(world: World) {
     Board: (() => {
       return defineComponent(
         world,
-        { id: RecsType.Number, white_player: RecsType.String, black_player: RecsType.String, turn: RecsType.Boolean, is_finished: RecsType.Boolean, winner: RecsType.String},
+        { id: RecsType.Number, white_player: RecsType.String, black_player: RecsType.String, turn: RecsType.Boolean, is_started: RecsType.Boolean, is_finished: RecsType.Boolean, winner: RecsType.String},
         {
           metadata: {
             name: "Board",
-            types: ["u64","ContractAddress","ContractAddress","bool", "bool", "ContractAddress"],
+            types: ["u64","ContractAddress","ContractAddress","bool", "bool", "bool", "ContractAddress"],
             customTypes: [],
           },
         }
