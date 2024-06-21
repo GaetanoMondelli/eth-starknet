@@ -223,7 +223,6 @@ function App() {
       console.log("turn", turn);
       
       setGame(
-        // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
         new Chess(
           convertCustomFenToStandard(fenString || "", turn) || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )

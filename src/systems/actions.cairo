@@ -10,6 +10,7 @@ trait IActions {
     fn spawn(ref world: IWorldDispatcher);
     fn move_piece(ref world: IWorldDispatcher, from: u64, to: u64);
     fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64, tokenQuantity: u64);
+    fn startGame(ref world: IWorldDispatcher);
 }
 
 // dojo decorator
@@ -284,6 +285,19 @@ mod actions {
 
             set!(world, (cell));
 
+        }
+
+        fn startGame(ref world: IWorldDispatcher) {
+            let mut board = get!(world, 1, Board);
+            if board.is_started == true {
+                return ();
+            }
+            if board.is_finished {
+                return ();
+            }
+            // check if all players have approved the game
+            board.is_started = true;
+            set!(world, (board));
         }
     }
 }
