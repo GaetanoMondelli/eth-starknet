@@ -206,7 +206,7 @@ export function processGame(chessMovesList: any, options: any = {}) {
       }
     });
     // Remove undefined pieces
-    Object.keys(d).forEa    ch((key) => {
+    Object.keys(d).forEach((key) => {
       if (key === "undefined") {
         delete d[key];
       }
