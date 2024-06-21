@@ -391,6 +391,14 @@
       {
         "name": "value",
         "type": "dojo_starter::models::board::Type"
+      },
+      {
+        "name": "nftRideId",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "tokenQuantity",
+        "type": "core::integer::u64"
       }
     ]
   },

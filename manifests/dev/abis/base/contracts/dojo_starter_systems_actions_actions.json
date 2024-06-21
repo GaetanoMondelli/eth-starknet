@@ -84,6 +84,26 @@
         ],
         "outputs": [],
         "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "ride_piece",
+        "inputs": [
+          {
+            "name": "fenPos",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "nftRideId",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "tokenQuantity",
+            "type": "core::integer::u64"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       }
     ]
   },

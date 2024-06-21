@@ -140,6 +140,8 @@ struct Cell {
     #[key]
     fenPos: u64,
     value: Type,
+    nftRideId: u64,
+    tokenQuantity: u64,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -150,6 +152,7 @@ struct Board {
     white_player: ContractAddress,
     black_player: ContractAddress,
     turn: bool,
+    is_started: bool,
     is_finished: bool,
     winner: ContractAddress,
 }

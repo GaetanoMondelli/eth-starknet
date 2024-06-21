@@ -9,6 +9,7 @@ use dojo_starter::models::board::{Type};
 trait IActions {
     fn spawn(ref world: IWorldDispatcher);
     fn move_piece(ref world: IWorldDispatcher, from: u64, to: u64);
+    fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64, tokenQuantity: u64);
 }
 
 // dojo decorator
@@ -35,6 +36,7 @@ mod actions {
                         black_player: player,
                         turn: false,
                         is_finished: false,
+                        is_started: false,
                         winner: player
                     },
                 )
@@ -83,6 +85,8 @@ mod actions {
                         Cell {
                             fenPos: i,
                             value: t_type,
+                            nftRideId: 0,
+                            tokenQuantity: 0,
                         },
                     )
                 );
@@ -102,6 +106,13 @@ mod actions {
             let mut cell_from = get!(world, from, Cell);
             let mut cell_to = get!(world, to, Cell);
 
+            if board.is_finished {
+                return ();
+            }
+
+            if board.is_started == false {
+                return ();
+            }
 
             // if cell_from.value.is_empty(){
             //     return ();
@@ -226,6 +237,7 @@ mod actions {
                         black_player: board.black_player,
                         turn: true,
                         is_finished: toPiece.is_king(),
+                        is_started: board.is_started,
                         winner: player,
                     },
                  cell_from, cell_to));
@@ -237,12 +249,40 @@ mod actions {
                         black_player: board.black_player,
                         turn: false,
                         is_finished: toPiece.is_king(),
+                        is_started: board.is_started,
                         winner: player,
                     },
                  cell_from, cell_to));
             }
 
 
+
+        }
+
+        fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64, tokenQuantity: u64) {
+            let board = get!(world, 1, Board);
+            if board.is_started == true {
+                return ();
+            }
+            if board.is_finished {
+                return ();
+            }
+
+            // let player = get_caller_address();
+
+            // if board.white_player == player && fenPos > 16 {
+            //     return ();
+            // }
+
+            // if board.black_player == player && fenPos < 47 {
+            //     return ();
+            // }
+
+            let mut cell = get!(world, fenPos, Cell);
+            cell.nftRideId = nftRideId;
+            cell.tokenQuantity = tokenQuantity;
+
+            set!(world, (cell));
 
         }
     }
