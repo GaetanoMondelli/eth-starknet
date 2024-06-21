@@ -43,7 +43,50 @@ export async function setupWorld(provider: DojoProvider) {
       }
     };
 
-    return { spawn, move_piece };
+    const ride_piece = async ({
+      account,
+      fenPos,
+      nftRideId,
+      tokenQuantity,
+    }: {
+      account: AccountInterface;
+      fenPos: number;
+      nftRideId: number;
+      tokenQuantity: number;
+    }) => {
+      try {
+        return await provider.execute(account, {
+          contractName: "actions",
+          entrypoint: "ride_piece",
+          calldata: [fenPos, nftRideId, tokenQuantity],
+        });
+      } catch (error) {
+        console.error("Error executing ride:", error);
+        throw error;
+      }
+    };
+
+    const startGame = async ({
+      account,
+    }: {
+      account: AccountInterface;
+      fenPos: number;
+      nftRideId: number;
+      tokenQuantity: number;
+    }) => {
+      try {
+        return await provider.execute(account, {
+          contractName: "actions",
+          entrypoint: "startGame",
+          calldata: [],
+        });
+      } catch (error) {
+        console.error("Error executing ride:", error);
+        throw error;
+      }
+    };
+
+    return { spawn, move_piece, ride_piece, startGame };
   }
   return {
     actions: actions(),
