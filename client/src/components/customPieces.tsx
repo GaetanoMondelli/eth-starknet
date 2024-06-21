@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Avatar, Button, Popover, Select, Space } from "antd";
 import { useState } from "react";
 
@@ -22,10 +23,11 @@ const pieces = [
 ];
 
 const customPieces = (
-    selectIcon: unknown,
-    selectedPiece: unknown,
-    selectToRide: unknown,
-    setSelectedToRide: unknown,
+    selectIcon: any,
+    selectedPiece: any,
+    selectToRide: any,
+    setSelectedToRide: any,
+    tokenBalance: any
 ) => {
   const returnPieces: any = {};
   pieces.map((p) => {
@@ -57,7 +59,7 @@ const customPieces = (
                       options={
                         tokenBalance?.map((token: any, index: any) => {
                           //  do ellipsis on token_address
-                          let address =
+                          const address =
                             token.token_address.slice(0, 2) +
                             "..." +
                             token.token_address.slice(-2);
