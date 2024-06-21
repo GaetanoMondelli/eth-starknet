@@ -10,6 +10,7 @@ import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 import customPieces from "./components/customPieces";
 import { boardNotation } from "./utils";
+import { set } from "mobx";
 
 function chessPositionToIndex(pos) {
   // Extract the column (letter) and row (number)
@@ -160,6 +161,16 @@ function App() {
     const fetchAndSetGamePos = async () => {
       const fenString = await fetchCells();
       setGamePos(convertCustomFenToStandard(fenString || ""));
+      console.log("fenString initial", fenString);
+
+      // rnbqkbnrppppEpppEEEEEEEEEEEEpEEEEEPEEEEEEEEPPEEEPPEEEPPPRNBQKBNR
+      
+      setGame(
+        // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+        new Chess(
+          convertCustomFenToStandard(fenString || "") || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        )
+      );
     };
 
     fetchAndSetGamePos();
@@ -241,72 +252,80 @@ function App() {
 
         {gamePos && (
           <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "50px",
-          }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "50px",
+            }}
           >
-          <Chessboard
-            customBoardStyle={
-              {
+            <Chessboard
+              customBoardStyle={{
                 border: "1px solid #000",
                 margin: "0 auto",
                 borderRadius: "10px",
+              }}
+              id="BasicBoard"
+              boardWidth={900}
+              position={
+                // loading ? "" : gamePos
+                gamePos
               }
-            }
-            id="BasicBoard"
-            boardWidth={900}
-            position={
-              loading ? "" : gamePos
-            }
-            customPieces={customPieces(
-              selectIcon,
-              selectedPiece,
-              selectToRide,
-              setSelectToRide,
-              tokenBalance
-            )}
-            onPieceDrop={(from, to) => {
-              console.log("move", from, to);
-              console.log(
-                "move",
-                chessPositionToIndex(from),
-                chessPositionToIndex(to)
-              );
+              customPieces={customPieces(
+                selectIcon,
+                selectedPiece,
+                selectToRide,
+                setSelectToRide,
+                tokenBalance
+              )}
+              onPieceDrop={(from, to) => {
+                console.log("move", from, to);
+                console.log(
+                  "move",
+                  chessPositionToIndex(from),
+                  chessPositionToIndex(to)
+                );
 
-              client.actions
-                .move_piece({
-                  account,
-                  from: chessPositionToIndex(from),
-                  to: chessPositionToIndex(to),
-                })
-                .then(async (res) => {
-                  console.log("Piece moved successfully", res);
-                  setLoading(true);
-                  // Delay before fetching cells
-                  setTimeout(async () => {
-                    const fenString = await fetchCells();
-                    console.log(
-                      "fenString",
-                      convertCustomFenToStandard(fenString || "")
-                    );
-                    setGamePos(convertCustomFenToStandard(fenString || ""));
-                    setLoading(false);
-                  }, 800);
-                })
-                .catch((error) => {
-                  console.error("Error moving piece:", error);
+                const okay = game.move({
+                  from: from,
+                  to: to,
+                  promotion: "q",
                 });
 
-              return true;
-            }}
-            onPieceClick={onPieceClick}
-            onSquareClick={onSquareClick}
-            boardWidth={500}
-            customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
-            customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
-          />
+                console.log("okay", okay.after);
+                setGamePos(okay.after);
+
+                client.actions
+                  .move_piece({
+                    account,
+                    from: chessPositionToIndex(from),
+                    to: chessPositionToIndex(to),
+                  })
+                  .then(async (res) => {
+                    console.log("Piece moved successfully", res);
+                    setLoading(true);
+                    // Delay before fetching cells
+                    setTimeout(async () => {
+                      const fenString = await fetchCells();
+                      console.log(
+                        "fenString",
+                        convertCustomFenToStandard(fenString || "")
+                      );
+                      setGamePos(convertCustomFenToStandard(fenString || ""));
+                      setLoading(false);
+                    }, 800);
+                  })
+                  .catch((error) => {
+                    console.error("Error moving piece:", error);
+                  });
+
+                return true;
+              }}
+              onPieceClick={onPieceClick}
+              onSquareClick={onSquareClick}
+              boardWidth={500}
+              customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
+              customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
+            />
           </div>
         )}
       </div>
