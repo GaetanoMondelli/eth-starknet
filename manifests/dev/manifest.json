@@ -1020,8 +1020,8 @@
     {
       "kind": "DojoContract",
       "address": "0x3610b797baec740e2fa25ae90b4a57d92b04f48a1fdbae1ae203eaf9723c1a0",
-      "class_hash": "0x36f5e1b3c768a85da0a80e22637a99f8af706c7aed34ebf338cc5b064964286",
-      "original_class_hash": "0x36f5e1b3c768a85da0a80e22637a99f8af706c7aed34ebf338cc5b064964286",
+      "class_hash": "0x3467e5725906f64dfc0c11562c0f4e6f415a09045f166047109debd28740868",
+      "original_class_hash": "0x3467e5725906f64dfc0c11562c0f4e6f415a09045f166047109debd28740868",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -1107,6 +1107,33 @@
                   "type": "core::integer::u64"
                 }
               ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "ride_piece",
+              "inputs": [
+                {
+                  "name": "fenPos",
+                  "type": "core::integer::u64"
+                },
+                {
+                  "name": "nftRideId",
+                  "type": "core::integer::u64"
+                },
+                {
+                  "name": "tokenQuantity",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "startGame",
+              "inputs": [],
               "outputs": [],
               "state_mutability": "external"
             }
@@ -1226,6 +1253,11 @@
           "key": false
         },
         {
+          "name": "is_started",
+          "type": "bool",
+          "key": false
+        },
+        {
           "name": "is_finished",
           "type": "bool",
           "key": false
@@ -1236,8 +1268,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x31820b400b0a977c4008608f10560a116b50961717cd5405d5b505385bae33d",
-      "original_class_hash": "0x31820b400b0a977c4008608f10560a116b50961717cd5405d5b505385bae33d",
+      "class_hash": "0x580b432037b0253af19af0e610427da252994f972a15de3c39a4a2280b98158",
+      "original_class_hash": "0x580b432037b0253af19af0e610427da252994f972a15de3c39a4a2280b98158",
       "abi": [
         {
           "type": "impl",
@@ -1597,6 +1629,10 @@
               "type": "core::bool"
             },
             {
+              "name": "is_started",
+              "type": "core::bool"
+            },
+            {
               "name": "is_finished",
               "type": "core::bool"
             },
@@ -1645,10 +1681,20 @@
           "name": "value",
           "type": "Type",
           "key": false
+        },
+        {
+          "name": "nftRideId",
+          "type": "u64",
+          "key": false
+        },
+        {
+          "name": "tokenQuantity",
+          "type": "u64",
+          "key": false
         }
       ],
-      "class_hash": "0x113c0ab02de1d4dfd5efd2dc20c70e6eb9cb2e602d81451ebcb1b3685a50ee1",
-      "original_class_hash": "0x113c0ab02de1d4dfd5efd2dc20c70e6eb9cb2e602d81451ebcb1b3685a50ee1",
+      "class_hash": "0x30ff74acafcb6aaa3ad8954234e74511204c2c3f6c759e9f46b29bee00e85cf",
+      "original_class_hash": "0x30ff74acafcb6aaa3ad8954234e74511204c2c3f6c759e9f46b29bee00e85cf",
       "abi": [
         {
           "type": "impl",
@@ -2042,6 +2088,14 @@
             {
               "name": "value",
               "type": "dojo_starter::models::board::Type"
+            },
+            {
+              "name": "nftRideId",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "tokenQuantity",
+              "type": "core::integer::u64"
             }
           ]
         },

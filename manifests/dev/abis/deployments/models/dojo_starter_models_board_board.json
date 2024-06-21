@@ -357,6 +357,10 @@
         "type": "core::bool"
       },
       {
+        "name": "is_started",
+        "type": "core::bool"
+      },
+      {
         "name": "is_finished",
         "type": "core::bool"
       },

@@ -66,13 +66,10 @@ export async function setupWorld(provider: DojoProvider) {
       }
     };
 
-    const startGame = async ({
+    const start_game = async ({
       account,
     }: {
       account: AccountInterface;
-      fenPos: number;
-      nftRideId: number;
-      tokenQuantity: number;
     }) => {
       try {
         return await provider.execute(account, {
@@ -86,7 +83,7 @@ export async function setupWorld(provider: DojoProvider) {
       }
     };
 
-    return { spawn, move_piece, ride_piece, startGame };
+    return { spawn, move_piece, ride_piece, start_game };
   }
   return {
     actions: actions(),

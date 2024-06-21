@@ -93,6 +93,7 @@ const queryBoard = `
         black_player
         turn
         is_finished
+        is_started
         winner
         entity {
           id
@@ -118,6 +119,8 @@ const query = `
       node {
         fenPos
         value
+        nftRideId
+        tokenQuantity
         entity {
           id
           __typename
@@ -139,6 +142,7 @@ const query = `
 function App() {
   const [game, setGame] = useState(new Chess());
   const [gamePos, setGamePos] = useState<any>("");
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const [selectIcon, setSelectedIcon] = useState<string>("");
   const [selectedPiece, setSelectedPiece] = useState<string>("");
   const [selectToRide, setSelectToRide] = useState<string>();
@@ -147,7 +151,6 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
 
   const fetchTurn = async () => {
     try {
@@ -165,15 +168,16 @@ function App() {
         throw new Error(result.errors.map((e) => e.message).join(", "));
       }
 
-      console.log("FETCH-turn", result.data.boardModels.edges[0].node.turn);
+      console.log("FETCH-turn", result.data.boardModels.edges[0].node);
 
       const turn = result.data.boardModels.edges[0].node.turn;
+      const is_started = result.data.boardModels.edges[0].node.is_started;
 
-      return turn;
+      return { turn, is_started };
     } catch (err: any) {
       console.error(err);
     }
-  }
+  };
 
   const fetchCells = async () => {
     try {
@@ -218,13 +222,16 @@ function App() {
       setGamePos(convertCustomFenToStandard(fenString || ""));
       console.log("fenString initial", fenString);
 
-      const blackTurn = await fetchTurn();
-      const turn = blackTurn ? "b" : "w";
+      const response = await fetchTurn();
+      const turn = response?.turn ? "b" : "w";
+      const is_started = response?.is_started;
+      setIsGameStarted(is_started);
       console.log("turn", turn);
-      
+
       setGame(
         new Chess(
-          convertCustomFenToStandard(fenString || "", turn) || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+          convertCustomFenToStandard(fenString || "", turn) ||
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
       );
     };
@@ -288,20 +295,39 @@ function App() {
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl text-center">Degen Zkhess</h1>
-
+      <button
+        onClick={async () => {
+          await client.actions.spawn({ account });
+          // refresh the page
+          // wait 5 seconds
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }}
+      >
+        spawn
+      </button>
       <div className="text-xl py-3">
         {board?.id && (
           <>
             <div>Board Registered</div>
             <div>Turn {game.turn()}</div>
             <div>Move {loading ? "loading" : "not loading"}</div>
+            <div>Game Started {isGameStarted ? "yes" : "no"}</div>
+
             <button
               onClick={async () => {
-                await client.actions.spawn({ account });
+                await client.actions.start_game({ account });
+                // refresh the page
+                // wait 5 seconds
+                setTimeout(() => {
+                  window.location.reload();
+                }, 3000);
               }}
             >
-              spawn
+              Start Game
             </button>
+
             <br></br>
           </>
         )}
@@ -367,7 +393,12 @@ function App() {
                         convertCustomFenToStandard(fenString || "")
                       );
 
-                      setGamePos(convertCustomFenToStandard(fenString || "", game.turn() === "w" ? "b" : "w"));
+                      setGamePos(
+                        convertCustomFenToStandard(
+                          fenString || "",
+                          game.turn() === "w" ? "b" : "w"
+                        )
+                      );
                       setLoading(false);
                     }, 800);
                   })
