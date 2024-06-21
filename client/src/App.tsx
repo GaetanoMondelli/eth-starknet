@@ -29,7 +29,7 @@ function chessPositionToIndex(pos) {
   return index;
 }
 
-function convertCustomFenToStandard(customFen: string) {
+function convertCustomFenToStandard(customFen: string, turn: string = "w") {
   // Split the custom FEN string into rows
   const rows = [];
   for (let i = 0; i < 8; i++) {
@@ -61,7 +61,7 @@ function convertCustomFenToStandard(customFen: string) {
   let standardFen = fenRows.join("/");
 
   // Add the remaining FEN information for a starting position
-  standardFen += " w KQkq - 0 1";
+  standardFen += ` ${turn} KQkq - 0 1`;
 
   return standardFen;
 }
@@ -82,6 +82,34 @@ function CellBoard({ fenPos }: { fenPos: number }) {
 
   return cell.value;
 }
+
+const queryBoard = `
+{
+  boardModels(where: { idEQ: "1" }) {
+    edges {
+      node {
+        id
+        white_player
+        black_player
+        turn
+        is_finished
+        winner
+        entity {
+          id
+          __typename
+        }
+      }
+      cursor
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}`;
 
 const query = `
 {
@@ -119,6 +147,33 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+
+  const fetchTurn = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: queryBoard }),
+      });
+
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors.map((e) => e.message).join(", "));
+      }
+
+      console.log("FETCH-turn", result.data.boardModels.edges[0].node.turn);
+
+      const turn = result.data.boardModels.edges[0].node.turn;
+
+      return turn;
+    } catch (err: any) {
+      console.error(err);
+    }
+  }
 
   const fetchCells = async () => {
     try {
@@ -163,12 +218,14 @@ function App() {
       setGamePos(convertCustomFenToStandard(fenString || ""));
       console.log("fenString initial", fenString);
 
-      // rnbqkbnrppppEpppEEEEEEEEEEEEpEEEEEPEEEEEEEEPPEEEPPEEEPPPRNBQKBNR
+      const blackTurn = await fetchTurn();
+      const turn = blackTurn ? "b" : "w";
+      console.log("turn", turn);
       
       setGame(
         // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
         new Chess(
-          convertCustomFenToStandard(fenString || "") || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+          convertCustomFenToStandard(fenString || "", turn) || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
       );
     };
@@ -237,7 +294,7 @@ function App() {
         {board?.id && (
           <>
             <div>Board Registered</div>
-            <div>Turn {board.turn ? "black" : "white"}</div>
+            <div>Turn {game.turn()}</div>
             <div>Move {loading ? "loading" : "not loading"}</div>
             <button
               onClick={async () => {
@@ -310,7 +367,8 @@ function App() {
                         "fenString",
                         convertCustomFenToStandard(fenString || "")
                       );
-                      setGamePos(convertCustomFenToStandard(fenString || ""));
+
+                      setGamePos(convertCustomFenToStandard(fenString || "", game.turn() === "w" ? "b" : "w"));
                       setLoading(false);
                     }, 800);
                   })
@@ -322,7 +380,6 @@ function App() {
               }}
               onPieceClick={onPieceClick}
               onSquareClick={onSquareClick}
-              boardWidth={500}
               customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
               customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
             />
