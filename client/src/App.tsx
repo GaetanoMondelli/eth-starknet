@@ -180,6 +180,9 @@ function App() {
   const [selectToRide, setSelectToRide] = useState<string>();
   const [positions, setPositions] = useState(boardNotation);
   const [tokenBalance, setTokenBalance] = useState<any>(null);
+  const [nftIds, setNftdIds] = useState<any>([]);
+  const [balances, setBalances] = useState<any>([]);
+
   const [tokens, setTokens] = useState({
     erc20: { white: 0, black: 0 },
     erc721: { white: [], black: [] },
@@ -244,9 +247,6 @@ function App() {
         throw new Error(result.errors.map((e) => e.message).join(", "));
       }
 
-      console.log("FETCH-turn", result.data.boardModels.edges[0].node);
-      console.log("FETCH-turn", result.data.boardModels.edges[0].node);
-
       const turn = result.data.boardModels.edges[0].node.turn;
       const is_started = result.data.boardModels.edges[0].node.is_started;
 
@@ -256,7 +256,7 @@ function App() {
     }
   };
 
-  const fetchCells = async () => {
+  const fetchCells: any = async () => {
     try {
       const response = await fetch("http://localhost:8080/graphql", {
         method: "POST",
@@ -272,6 +272,24 @@ function App() {
         throw new Error(result.errors.map((e) => e.message).join(", "));
       }
 
+      console.log("FETCH-cells", result.data.cellModels.edges.sort(
+        (a: { node: { fenPos: number; }; }, b: { node: { fenPos: number; }; }) => a.node.fenPos - b.node.fenPos
+      ));
+
+      const nftIds = result.data.cellModels.edges
+      .map((edge: { node: any }) => edge.node)
+      .sort(
+        (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
+      )
+      .map((cell: any) => cell.nftRideId);
+
+      const tokenQuantities = result.data.cellModels.edges
+      .map((edge: { node: any }) => edge.node)
+      .sort(
+        (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
+      )
+      .map((cell: any) => cell.tokenQuantity);
+
       const cells = result.data.cellModels.edges
         .map((edge: { node: any }) => edge.node)
         .sort(
@@ -286,8 +304,8 @@ function App() {
           cells[i].toLowerCase() === "knight" ? cells[i][1] : cells[i][0];
         fenString = fenString.slice(0, i) + symbol + fenString.slice(i + 1);
       }
-      console.log("FETCH-fenString", fenString);
-      return fenString;
+      console.log("FETCH-fenString", { fenString, nftIds, tokenQuantities });
+      return { fenString, nftIds, tokenQuantities };
     } catch (err: any) {
       console.error(err);
     }
@@ -295,9 +313,12 @@ function App() {
 
   useEffect(() => {
     const fetchAndSetGamePos = async () => {
-      const fenString = await fetchCells();
+      const { fenString, nftIds, tokenQuantities } = await fetchCells();
       setGamePos(convertCustomFenToStandard(fenString || ""));
       console.log("fenString initial", fenString);
+
+      setNftdIds(nftIds);
+      setBalances(tokenQuantities);
 
       const tokens = await fetchTokens();
       setTokens(tokens as any);
@@ -362,13 +383,13 @@ function App() {
   // const [fetch, setFetch] = useState(false);
   // useState<"red" | "blue">("red");
 
-  const grid = useMemo(() => {
-    const board = [];
-    for (let col = 0; col < 64; col++) {
-      board.push(<CellBoard key={`${col}`} fenPos={col} />);
-    }
-    return board;
-  }, [fetch]);
+  // const grid = useMemo(() => {
+  //   const board = [];
+  //   for (let col = 0; col < 64; col++) {
+  //     board.push(<CellBoard key={`${col}`} fenPos={col} />);
+  //   }
+  //   return board;
+  // }, [fetch]);
 
   // console.log(Number(player?.last_action.toString()) || 0);
 
@@ -394,7 +415,8 @@ function App() {
             <div>Turn {game.turn()}</div>
             <div>Move {loading ? "loading" : "not loading"}</div>
             <div>Game Started {isGameStarted ? "yes" : "no"}</div>
-
+            {/* <div>Winner {game.in_checkmate() ? game.turn() : "none"}</div> */}
+            <div>Selected Piece {selectedPiece}</div>
             <button
               onClick={async () => {
                 await client.actions.start_game({ account });
@@ -407,7 +429,12 @@ function App() {
             >
               Start Game
             </button>
+            <br></br>
+            {/* <pre>{JSON.stringify(board, null, 2)}</pre>
+            <pre>{JSON.stringify(nftIds, null, 2)}</pre> */}
 
+            <br></br>
+            <br></br>
             <br></br>
           </>
         )}
@@ -427,7 +454,7 @@ function App() {
                   borderRadius: "10px",
                 }}
                 id="BasicBoard"
-                boardWidth={900}
+                boardWidth={700}
                 position={
                   // loading ? "" : gamePos
                   gamePos
@@ -437,7 +464,13 @@ function App() {
                   selectedPiece,
                   selectToRide,
                   setSelectToRide,
-                  tokenBalance
+                  tokens,
+                  client,
+                  account,
+                  nftIds,
+                  balances,
+                  fetchCells,
+                  isGameStarted
                 )}
                 onPieceDrop={(from, to) => {
                   console.log("move", from, to);
@@ -467,7 +500,7 @@ function App() {
                       setLoading(true);
                       // Delay before fetching cells
                       setTimeout(async () => {
-                        const fenString = await fetchCells();
+                        const { fenString } = await fetchCells();
                         console.log(
                           "fenString",
                           convertCustomFenToStandard(fenString || "")
@@ -538,7 +571,7 @@ function App() {
                       </Card>
                       <h2>ERC721</h2>
                       <List
-                        grid={{ gutter: 16, column: 5 }}
+                        grid={{ gutter: 16, column: 4 }}
                         dataSource={tokens.erc721.white}
                         renderItem={(item: any) => (
                           <List.Item>
@@ -613,7 +646,7 @@ function App() {
                       </Card>
                       <h2>ERC721</h2>
                       <List
-                        grid={{ gutter: 16, column: 5 }}
+                        grid={{ gutter: 16, column: 4 }}
                         dataSource={tokens.erc721.black}
                         renderItem={(item: any) => (
                           <List.Item>
@@ -627,7 +660,7 @@ function App() {
                                 <img
                                   alt="example"
                                   src={`/${BigInt(item.node.nftId)}.png`}
-                                  style={{ width: 250 }}
+                                  style={{ width: 200 }}
                                 />
                               }
                               type="inner"
@@ -663,7 +696,6 @@ function App() {
         <br></br>
         <br></br>
 
-        <h1 className="text-3xl text-center">Wallets</h1>
         <br></br>
 
         {/* <pre>

@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Avatar, Button, Popover, Select, Space } from "antd";
-
-// const [selectIcon, setSelectedIcon] = useState<string>("");
-// const [selectedPiece, setSelectedPiece] = useState<string>("");
-
-// const [hasGameStatarted, setHasGameStarted] = useState<boolean>(true);
+import { boardNotationToFen } from "../utils";
 
 const pieces = [
   "wP",
@@ -22,97 +18,110 @@ const pieces = [
 ];
 
 const customPieces = (
-    selectIcon: any,
-    selectedPiece: any,
-    selectToRide: any,
-    setSelectedToRide: any,
-    tokenBalance: any
+  selectIcon: any,
+  selectedPiece: any,
+  selectToRide: any,
+  setSelectedToRide: any,
+  tokens: any,
+  client: any,
+  account: any,
+  nftIds: any,
+  balances: any,
+  fetchCells: any,
+  isGameStarted: any
 ) => {
   const returnPieces: any = {};
   pieces.map((p) => {
     returnPieces[p] = ({ squareWidth }: any) => (
       <Popover
         trigger="click"
-        title={"Wrapping " + selectedPiece}
+        title={"Wrapping " + selectedPiece + " "}
+        onOpenChange={() => {
+          setSelectedToRide("");
+        }}
         content={
           <>
             <Card
               style={{ width: 350 }}
               extra={
-                <>
-                  <Space>
+                  !isGameStarted && <Space>
                     <Avatar
-                      src={
-                        selectToRide !== undefined
-                          ? "https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2021%2F10%2Fbored-ape-yacht-club-nft-3-4-million-record-sothebys-metaverse-1.jpg?q=90&w=1400&cbr=1&fit=max"
-                          : `http://localhost:3000/${selectIcon}.png`
-                      }
+                      size={50}
+                      src={`http://localhost:5173/${selectToRide}.png`}
                     />
                     <Select
                       style={{ width: 170 }}
                       placeholder="NFT 2 ride the piece"
                       onChange={(value: any) => {
                         console.log("value", value);
+                        console.log(
+                          "selectedPiece",
+                          `http://localhost:5173/${selectToRide}.png`
+                        );
                         setSelectedToRide(value);
                       }}
                       options={
-                        tokenBalance?.map((token: any, index: any) => {
-                          //  do ellipsis on token_address
-                          const address =
-                            token.token_address.slice(0, 2) +
-                            "..." +
-                            token.token_address.slice(-2);
-                          return {
-                            label:
-                              "Bored Ape Chess" +
-                              // token.collection.name +
-                              "- " +
-                              address +
-                              " - " +
-                              token.token_id,
-                            // index of token in array select
-                            value: index,
-                          };
-                        }) || []
+                        (() =>
+                          selectedPiece.includes("w")
+                            ? tokens?.erc721?.white
+                            : tokens?.erc721?.black)().map(
+                          (item: any, index: any) => {
+                            //  do ellipsis on token_address
+                            // const address =
+                            //   token.token_address.slice(0, 2) +
+                            //   "..." +
+                            //   token.token_address.slice(-2);
+                            const token = item.node;
+                            return {
+                              label:
+                                // "Bored Ape Chess" +
+                                // token.collection.name +
+                                "Token ID:" +
+                                selectedPiece +
+                                // address +
+                                token.nftId,
+                              // index of token in array select
+                              value: Number(token.nftId).toString(),
+                            };
+                          }
+                        ) || []
                       }
                     ></Select>
                     <Button
                       disabled={false}
                       onClick={async () => {
-                        //   const { address } = await link.setup({});
-                        //   try {
-                        //     const transferResponsePayload = await link.transfer(
-                        //       [
-                        //         {
-                        //           type: ERC721TokenType.ERC721,
-                        //           tokenId: '1',
-                        //           tokenAddress:
-                        //             '0xd314b8e99cadf438a00c7975a92b89ddb524aa65',
-                        //           toAddress:
-                        //             '0x3783c988e6436f966B0B19AA948a566d7361bd3d',
-                        //         },
-                        //       ],
-                        //     );
-                        //     // Print the result
-                        //     console.log(transferResponsePayload);
-                        //   } catch (error) {
-                        //     // Catch and print out the error
-                        //     console.error(error);
-                        //   }
-                        // console.log('wrap', selectedPiece, response);
+                        console.log("ride", {
+                          fenPos: boardNotationToFen[selectedPiece],
+                          nftRideId: Number(selectToRide),
+                        });
+                        client.actions.ride_piece({
+                          account,
+                          fenPos: boardNotationToFen[selectedPiece],
+                          nftRideId: Number(selectToRide),
+                        });
                       }}
                     >
                       Ride {selectedPiece}
                     </Button>
-                  </Space>
-                </>
+                  </Space >
               }
             >
               <Card.Meta
                 avatar={
-                  <Avatar src={`http://localhost:3000/${selectIcon}.png`} />
+                  <Avatar
+                    size={80}
+                    src={`http://localhost:5173/${Number(
+                      nftIds[boardNotationToFen[selectedPiece]]
+                    )}.png`}
+                  />
                 }
-                description="This is the degenchess piece you want your NFT to ride"
+                description={
+                  "balance " +
+                  balances[boardNotationToFen[selectedPiece]] +
+                  " nftId " +
+                  Number(nftIds[boardNotationToFen[selectedPiece]])
+                }
+                // description="This is the degenchess piece you want your NFT to ride"
               />
             </Card>
           </>
@@ -125,7 +134,15 @@ const customPieces = (
             backgroundImage: `url(/${p}.png)`,
             backgroundSize: "100%",
           }}
-        />
+        >
+          {/* <Avatar
+            style={{
+              marginRight: "50%",
+            }}
+            src={`http://localhost:5173/${Number(nftIds[boardNotationToFen[p]])}.png`}
+            shape="square"
+          >{p}</Avatar> */}
+        </div>
       </Popover>
     );
     return null;

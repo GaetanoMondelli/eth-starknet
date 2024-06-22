@@ -345,16 +345,16 @@
     "name": "dojo_starter::models::board::ERC20",
     "members": [
       {
+        "name": "ownerType",
+        "type": "dojo_starter::models::board::PlayerType"
+      },
+      {
         "name": "id",
         "type": "core::integer::u64"
       },
       {
         "name": "owner",
         "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "ownerType",
-        "type": "dojo_starter::models::board::PlayerType"
       },
       {
         "name": "balance",

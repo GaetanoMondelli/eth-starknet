@@ -345,6 +345,10 @@
     "name": "dojo_starter::models::board::ERC721",
     "members": [
       {
+        "name": "nftId",
+        "type": "core::integer::u64"
+      },
+      {
         "name": "id",
         "type": "core::integer::u64"
       },
@@ -355,10 +359,6 @@
       {
         "name": "ownerType",
         "type": "dojo_starter::models::board::PlayerType"
-      },
-      {
-        "name": "nftId",
-        "type": "core::integer::u64"
       },
       {
         "name": "attribute",

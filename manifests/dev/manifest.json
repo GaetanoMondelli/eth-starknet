@@ -1020,8 +1020,8 @@
     {
       "kind": "DojoContract",
       "address": "0x3610b797baec740e2fa25ae90b4a57d92b04f48a1fdbae1ae203eaf9723c1a0",
-      "class_hash": "0x74bc677c8e9949ff0166f31284e51a89ae0a5e38414f32888809f2a6846ff8a",
-      "original_class_hash": "0x74bc677c8e9949ff0166f31284e51a89ae0a5e38414f32888809f2a6846ff8a",
+      "class_hash": "0x5a73a43bac0db26e1d01f36e66ea1841a6f66e14d9a95bab603eb7ec354e20b",
+      "original_class_hash": "0x5a73a43bac0db26e1d01f36e66ea1841a6f66e14d9a95bab603eb7ec354e20b",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2142,19 +2142,19 @@
       "kind": "DojoModel",
       "members": [
         {
+          "name": "ownerType",
+          "type": "PlayerType",
+          "key": true
+        },
+        {
           "name": "id",
           "type": "u64",
-          "key": true
+          "key": false
         },
         {
           "name": "owner",
           "type": "ContractAddress",
-          "key": true
-        },
-        {
-          "name": "ownerType",
-          "type": "PlayerType",
-          "key": true
+          "key": false
         },
         {
           "name": "balance",
@@ -2162,8 +2162,8 @@
           "key": false
         }
       ],
-      "class_hash": "0xdfc3e187fe1739f738be13485d7b6b7efa81c8bc5c5bc1b7fde71c5d4e5f57",
-      "original_class_hash": "0xdfc3e187fe1739f738be13485d7b6b7efa81c8bc5c5bc1b7fde71c5d4e5f57",
+      "class_hash": "0x28e57678137ddcfc69a3ae9e6b6ec928ffb85a2c28eab05fce0fa824e220e3",
+      "original_class_hash": "0x28e57678137ddcfc69a3ae9e6b6ec928ffb85a2c28eab05fce0fa824e220e3",
       "abi": [
         {
           "type": "impl",
@@ -2511,16 +2511,16 @@
           "name": "dojo_starter::models::board::ERC20",
           "members": [
             {
+              "name": "ownerType",
+              "type": "dojo_starter::models::board::PlayerType"
+            },
+            {
               "name": "id",
               "type": "core::integer::u64"
             },
             {
               "name": "owner",
               "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "ownerType",
-              "type": "dojo_starter::models::board::PlayerType"
             },
             {
               "name": "balance",
@@ -2559,24 +2559,24 @@
       "kind": "DojoModel",
       "members": [
         {
-          "name": "id",
+          "name": "nftId",
           "type": "u64",
           "key": true
+        },
+        {
+          "name": "id",
+          "type": "u64",
+          "key": false
         },
         {
           "name": "owner",
           "type": "ContractAddress",
-          "key": true
+          "key": false
         },
         {
           "name": "ownerType",
           "type": "PlayerType",
-          "key": true
-        },
-        {
-          "name": "nftId",
-          "type": "u64",
-          "key": true
+          "key": false
         },
         {
           "name": "attribute",
@@ -2584,8 +2584,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x37cb66fd645f8074c46d3128b76eae3216dad40771095506fb48b1674931cb",
-      "original_class_hash": "0x37cb66fd645f8074c46d3128b76eae3216dad40771095506fb48b1674931cb",
+      "class_hash": "0x439acbe657a2463b348065117c5ab9b3a3640d431c45765e240b8d95f0d05a1",
+      "original_class_hash": "0x439acbe657a2463b348065117c5ab9b3a3640d431c45765e240b8d95f0d05a1",
       "abi": [
         {
           "type": "impl",
@@ -2933,6 +2933,10 @@
           "name": "dojo_starter::models::board::ERC721",
           "members": [
             {
+              "name": "nftId",
+              "type": "core::integer::u64"
+            },
+            {
               "name": "id",
               "type": "core::integer::u64"
             },
@@ -2943,10 +2947,6 @@
             {
               "name": "ownerType",
               "type": "dojo_starter::models::board::PlayerType"
-            },
-            {
-              "name": "nftId",
-              "type": "core::integer::u64"
             },
             {
               "name": "attribute",

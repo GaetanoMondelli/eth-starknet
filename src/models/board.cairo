@@ -153,11 +153,11 @@ struct Cell {
 #[dojo::model]
 struct ERC20 {
     #[key]
-    id: u64,
-    #[key]
-    owner: ContractAddress,
-    #[key]
     ownerType: PlayerType,
+    // #[key]
+    id: u64,
+    // #[key]
+    owner: ContractAddress,
     balance: u64,
 }
 
@@ -165,13 +165,13 @@ struct ERC20 {
 #[dojo::model]
 struct ERC721 {
     #[key]
-    id: u64,
-    #[key]
-    owner: ContractAddress,
-    #[key]
-    ownerType: PlayerType,
-    #[key]
     nftId: u64,
+    // #[key]
+    id: u64,
+    // #[key]
+    owner: ContractAddress,
+    // #[key]
+    ownerType: PlayerType,
     attribute: u64,
 }
 

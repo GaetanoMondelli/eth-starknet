@@ -79,6 +79,41 @@ export const boardNotation: any = {
   bph: "h7",
 };
 
+export const boardNotationToFen: any = {
+  wra: 56,  // a1
+  wnb: 57,  // b1
+  wbc: 58,  // c1
+  wqd: 59,  // d1
+  wke: 60,  // e1
+  wbf: 61,  // f1
+  wng: 62,  // g1
+  wrh: 63,  // h1
+  wpa: 48,  // a2
+  wpb: 49,  // b2
+  wpc: 50,  // c2
+  wpd: 51,  // d2
+  wpe: 52,  // e2
+  wpf: 53,  // f2
+  wpg: 54,  // g2
+  wph: 55,  // h2
+  bra: 0,   // a8
+  bnb: 1,   // b8
+  bbc: 2,   // c8
+  bqd: 3,   // d8
+  bke: 4,   // e8
+  bbf: 5,   // f8
+  bng: 6,   // g8
+  brh: 7,   // h8
+  bpa: 8,   // a7
+  bpb: 9,   // b7
+  bpc: 10,  // c7
+  bpd: 11,  // d7
+  bpe: 12,  // e7
+  bpf: 13,  // f7
+  bpg: 14,  // g7
+  bph: 15,  // h7
+};
+
 export function processGame(chessMovesList: any, options: any = {}) {
   const chess = new Chess();
   chess.loadPgn(chessMovesList);

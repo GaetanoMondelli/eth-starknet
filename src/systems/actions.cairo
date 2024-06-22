@@ -174,9 +174,6 @@ mod actions {
                 return ();
             }
 
-            let mut cell_from = get!(world, from, Cell);
-            let mut cell_to = get!(world, to, Cell);
-
             if board.is_finished {
                 return ();
             }
@@ -184,6 +181,10 @@ mod actions {
             if board.is_started == false {
                 return ();
             }
+
+            let mut cell_from = get!(world, from, Cell);
+            let mut cell_to = get!(world, to, Cell);
+
 
             // if cell_from.value.is_empty(){
             //     return ();
@@ -200,8 +201,6 @@ mod actions {
             // if to > 63 {
             //     return ();
             // }
-
-            let toPiece = cell_to.value;
 
             // if cell_from.value.is_pawn() {
             //     if cell_from.value.is_white() {
@@ -289,21 +288,27 @@ mod actions {
             // }
 
 
-
-            // else {
-            //     cell_to.value = cell_from.value;
-            //     cell_from.value = Type::Empty;
-            // }
-
             
             // UNCOMMENT FOR REMOVING CONSTRAINTS
-            let mut nftCaptureId = cell_to.nftRideId;
+            let toPiece = cell_to.value;
+            let nftCaptureId = cell_to.nftRideId;
             let tokenQuantity = cell_to.tokenQuantity;
 
-            cell_to.value = cell_from.value;
-            cell_to.nftRideId = cell_from.nftRideId;
-            cell_to.tokenQuantity = cell_from.tokenQuantity;
+            let newNftRideId = cell_from.nftRideId;
+            let newTokenQuantity = cell_from.tokenQuantity;
+            let newPiece = cell_from.value;
+
+
+            cell_to.value = newPiece;
+            cell_to.nftRideId = newNftRideId;
+            cell_to.tokenQuantity = newTokenQuantity;
+
             cell_from.value = Type::Empty;
+            cell_from.nftRideId = 0;
+            cell_from.tokenQuantity = 0;
+
+            set!(world, (cell_from));
+            set!(world, (cell_to));
 
             if nftCaptureId != 0 {
                 let mut nft = get!(world, nftCaptureId, ERC721);
@@ -325,7 +330,6 @@ mod actions {
                 erc20Player.balance = erc20Player.balance + tokenQuantity;
                 set!(world, (erc20Player));
             }
-
 
 
             if board.turn == false {
@@ -374,9 +378,9 @@ mod actions {
             //     return ();
             // }
 
-            let mut playerType = PlayerType::White;
+            let mut playerType = PlayerType::Black;
             if fenPos > 32 {
-                playerType = PlayerType::Black;
+                playerType = PlayerType::White;
             }
 
             // check the nft belongs to the player
