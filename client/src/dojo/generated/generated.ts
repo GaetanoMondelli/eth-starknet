@@ -47,18 +47,16 @@ export async function setupWorld(provider: DojoProvider) {
       account,
       fenPos,
       nftRideId,
-      tokenQuantity,
     }: {
       account: AccountInterface;
       fenPos: number;
       nftRideId: number;
-      tokenQuantity: number;
     }) => {
       try {
         return await provider.execute(account, {
           contractName: "actions",
           entrypoint: "ride_piece",
-          calldata: [fenPos, nftRideId, tokenQuantity],
+          calldata: [fenPos, nftRideId],
         });
       } catch (error) {
         console.error("Error executing ride:", error);
@@ -66,11 +64,28 @@ export async function setupWorld(provider: DojoProvider) {
       }
     };
 
-    const start_game = async ({
+    const assign_tokens = async ({
       account,
+      fenPos,
+      tokenQuantity,
     }: {
       account: AccountInterface;
+      fenPos: number;
+      tokenQuantity: number;
     }) => {
+      try {
+        return await provider.execute(account, {
+          contractName: "actions",
+          entrypoint: "ride_piece",
+          calldata: [fenPos, tokenQuantity],
+        });
+      } catch (error) {
+        console.error("Error executing assign_tokens:", error);
+        throw error;
+      }
+    };
+
+    const start_game = async ({ account }: { account: AccountInterface }) => {
       try {
         return await provider.execute(account, {
           contractName: "actions",
@@ -83,7 +98,7 @@ export async function setupWorld(provider: DojoProvider) {
       }
     };
 
-    return { spawn, move_piece, ride_piece, start_game };
+    return { spawn, move_piece, ride_piece, start_game, assign_tokens };
   }
   return {
     actions: actions(),

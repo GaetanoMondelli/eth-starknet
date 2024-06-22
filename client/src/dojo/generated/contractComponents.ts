@@ -32,6 +32,32 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    ERC20: (() => {
+      return defineComponent(
+        world,
+        { id: RecsType.Number, owner: RecsType.String, ownerType: RecsType.String, balance: RecsType.Number },
+        {
+          metadata: {
+            name: "Cell",
+            types: ["u64","contractaddress", "PlayerType", "u64"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
+    ERC721: (() => {
+      return defineComponent(
+        world,
+        { id: RecsType.Number, owner: RecsType.String, ownerType: RecsType.String, nftId: RecsType.Number, attributes: RecsType.Number },
+        {
+          metadata: {
+            name: "Cell",
+            types: ["u64","contractaddress", "PlayerType", "u64", "u64"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
     Board: (() => {
       return defineComponent(
         world,
