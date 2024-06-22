@@ -22,8 +22,8 @@ name = "dojo::base::base"
 [[contracts]]
 kind = "DojoContract"
 address = "0x3610b797baec740e2fa25ae90b4a57d92b04f48a1fdbae1ae203eaf9723c1a0"
-class_hash = "0x3467e5725906f64dfc0c11562c0f4e6f415a09045f166047109debd28740868"
-original_class_hash = "0x3467e5725906f64dfc0c11562c0f4e6f415a09045f166047109debd28740868"
+class_hash = "0x74bc677c8e9949ff0166f31284e51a89ae0a5e38414f32888809f2a6846ff8a"
+original_class_hash = "0x74bc677c8e9949ff0166f31284e51a89ae0a5e38414f32888809f2a6846ff8a"
 base_class_hash = "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46"
 abi = "manifests/dev/abis/deployments/contracts/dojo_starter_systems_actions_actions.json"
 reads = []
@@ -102,6 +102,65 @@ key = false
 
 [[models.members]]
 name = "tokenQuantity"
+type = "u64"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0xdfc3e187fe1739f738be13485d7b6b7efa81c8bc5c5bc1b7fde71c5d4e5f57"
+original_class_hash = "0xdfc3e187fe1739f738be13485d7b6b7efa81c8bc5c5bc1b7fde71c5d4e5f57"
+abi = "manifests/dev/abis/deployments/models/dojo_starter_models_board_erc_20.json"
+name = "dojo_starter::models::board::erc_20"
+
+[[models.members]]
+name = "id"
+type = "u64"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "ownerType"
+type = "PlayerType"
+key = true
+
+[[models.members]]
+name = "balance"
+type = "u64"
+key = false
+
+[[models]]
+kind = "DojoModel"
+class_hash = "0x37cb66fd645f8074c46d3128b76eae3216dad40771095506fb48b1674931cb"
+original_class_hash = "0x37cb66fd645f8074c46d3128b76eae3216dad40771095506fb48b1674931cb"
+abi = "manifests/dev/abis/deployments/models/dojo_starter_models_board_erc_721.json"
+name = "dojo_starter::models::board::erc_721"
+
+[[models.members]]
+name = "id"
+type = "u64"
+key = true
+
+[[models.members]]
+name = "owner"
+type = "ContractAddress"
+key = true
+
+[[models.members]]
+name = "ownerType"
+type = "PlayerType"
+key = true
+
+[[models.members]]
+name = "nftId"
+type = "u64"
+key = true
+
+[[models.members]]
+name = "attribute"
 type = "u64"
 key = false
 

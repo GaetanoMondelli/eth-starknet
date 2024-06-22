@@ -27,6 +27,8 @@ echo "--------------------------------------------------------------------------
 sozo auth grant --world $WORLD_ADDRESS --wait writer \
   Cell,dojo_starter::systems::actions::actions\
   Board,dojo_starter::systems::actions::actions\
+  ERC20,dojo_starter::systems::actions::actions\
+  ERC721,dojo_starter::systems::actions::actions\
   >/dev/null
 
 echo "Default authorizations have been successfully set."

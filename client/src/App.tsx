@@ -10,6 +10,9 @@ import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 import customPieces from "./components/customPieces";
 import { boardNotation } from "./utils";
+import { Card, Collapse, List, Tag } from "antd";
+// sha256
+import sha256 from "sha256";
 
 function chessPositionToIndex(pos) {
   // Extract the column (letter) and row (number)
@@ -82,6 +85,36 @@ function CellBoard({ fenPos }: { fenPos: number }) {
   return cell.value;
 }
 
+const queryTokens = `
+{
+  erc721Models(
+    first: 10,
+    where: { id: "1" }
+  ) {
+    edges {
+      node {
+        id
+        owner
+        nftId
+        ownerType
+      }
+    }
+  }
+  erc20Models(
+    where: { id: "1" } 
+  ) {
+    edges {
+      node {
+        id
+        owner
+        ownerType
+        balance
+      }
+    }
+  }
+}
+`;
+
 const queryBoard = `
 {
   boardModels(where: { idEQ: "1" }) {
@@ -147,9 +180,53 @@ function App() {
   const [selectToRide, setSelectToRide] = useState<string>();
   const [positions, setPositions] = useState(boardNotation);
   const [tokenBalance, setTokenBalance] = useState<any>(null);
+  const [tokens, setTokens] = useState({
+    erc20: { white: 0, black: 0 },
+    erc721: { white: [], black: [] },
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const fetchTokens = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: queryTokens }),
+      });
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors.map((e: any) => e.message).join(", "));
+      }
+
+      const erc20 = {
+        white: result.data.erc20Models.edges.find(
+          (edge: any) => edge.node.ownerType === "White"
+        ).node.balance,
+        black: result.data.erc20Models.edges.find(
+          (edge: any) => edge.node.ownerType === "Black"
+        ).node.balance,
+      };
+
+      const erc721 = {
+        white: result.data.erc721Models.edges.filter(
+          (edge: any) => edge.node.ownerType === "White"
+        ),
+        black: result.data.erc721Models.edges.filter(
+          (edge: any) => edge.node.ownerType === "Black"
+        ),
+      };
+      console.log("FETCH-tokens", { erc20, erc721 });
+
+      return { erc20, erc721 };
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
 
   const fetchTurn = async () => {
     try {
@@ -167,6 +244,7 @@ function App() {
         throw new Error(result.errors.map((e) => e.message).join(", "));
       }
 
+      console.log("FETCH-turn", result.data.boardModels.edges[0].node);
       console.log("FETCH-turn", result.data.boardModels.edges[0].node);
 
       const turn = result.data.boardModels.edges[0].node.turn;
@@ -220,6 +298,9 @@ function App() {
       const fenString = await fetchCells();
       setGamePos(convertCustomFenToStandard(fenString || ""));
       console.log("fenString initial", fenString);
+
+      const tokens = await fetchTokens();
+      setTokens(tokens as any);
 
       const response = await fetchTurn();
       const turn = response?.turn ? "b" : "w";
@@ -330,90 +411,264 @@ function App() {
             <br></br>
           </>
         )}
-
-        {gamePos && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "50px",
-            }}
-          >
-            <Chessboard
-              customBoardStyle={{
-                border: "1px solid #000",
-                margin: "0 auto",
-                borderRadius: "10px",
+        <div className="flex justify-between">
+          {gamePos && (
+            <div
+              style={{
+                // display: "flex",
+                // justifyContent: "center",
+                marginTop: "50px",
               }}
-              id="BasicBoard"
-              boardWidth={900}
-              position={
-                // loading ? "" : gamePos
-                gamePos
-              }
-              customPieces={customPieces(
-                selectIcon,
-                selectedPiece,
-                selectToRide,
-                setSelectToRide,
-                tokenBalance
-              )}
-              onPieceDrop={(from, to) => {
-                console.log("move", from, to);
-                console.log(
-                  "move",
-                  chessPositionToIndex(from),
-                  chessPositionToIndex(to)
-                );
+            >
+              <Chessboard
+                customBoardStyle={{
+                  border: "1px solid #000",
+                  margin: "0 auto",
+                  borderRadius: "10px",
+                }}
+                id="BasicBoard"
+                boardWidth={900}
+                position={
+                  // loading ? "" : gamePos
+                  gamePos
+                }
+                customPieces={customPieces(
+                  selectIcon,
+                  selectedPiece,
+                  selectToRide,
+                  setSelectToRide,
+                  tokenBalance
+                )}
+                onPieceDrop={(from, to) => {
+                  console.log("move", from, to);
+                  console.log(
+                    "move",
+                    chessPositionToIndex(from),
+                    chessPositionToIndex(to)
+                  );
 
-                const okay = game.move({
-                  from: from,
-                  to: to,
-                  promotion: "q",
-                });
-
-                console.log("okay", okay.after);
-                setGamePos(okay.after);
-
-                client.actions
-                  .move_piece({
-                    account,
-                    from: chessPositionToIndex(from),
-                    to: chessPositionToIndex(to),
-                  })
-                  .then(async (res) => {
-                    console.log("Piece moved successfully", res);
-                    setLoading(true);
-                    // Delay before fetching cells
-                    setTimeout(async () => {
-                      const fenString = await fetchCells();
-                      console.log(
-                        "fenString",
-                        convertCustomFenToStandard(fenString || "")
-                      );
-
-                      setGamePos(
-                        convertCustomFenToStandard(
-                          fenString || "",
-                          game.turn() === "w" ? "b" : "w"
-                        )
-                      );
-                      setLoading(false);
-                    }, 800);
-                  })
-                  .catch((error) => {
-                    console.error("Error moving piece:", error);
+                  const okay = game.move({
+                    from: from,
+                    to: to,
+                    promotion: "q",
                   });
 
-                return true;
-              }}
-              onPieceClick={onPieceClick}
-              onSquareClick={onSquareClick}
-              customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
-              customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
+                  console.log("okay", okay.after);
+                  setGamePos(okay.after);
+
+                  client.actions
+                    .move_piece({
+                      account,
+                      from: chessPositionToIndex(from),
+                      to: chessPositionToIndex(to),
+                    })
+                    .then(async (res) => {
+                      console.log("Piece moved successfully", res);
+                      setLoading(true);
+                      // Delay before fetching cells
+                      setTimeout(async () => {
+                        const fenString = await fetchCells();
+                        console.log(
+                          "fenString",
+                          convertCustomFenToStandard(fenString || "")
+                        );
+
+                        setGamePos(
+                          convertCustomFenToStandard(
+                            fenString || "",
+                            game.turn() === "w" ? "b" : "w"
+                          )
+                        );
+                        setLoading(false);
+                      }, 800);
+                    })
+                    .catch((error) => {
+                      console.error("Error moving piece:", error);
+                    });
+
+                  return true;
+                }}
+                onPieceClick={onPieceClick}
+                onSquareClick={onSquareClick}
+                customDarkSquareStyle={{ backgroundColor: "#0033FF" }}
+                customLightSquareStyle={{ backgroundColor: "#FF00FF" }}
+              />
+            </div>
+          )}
+          <div
+            style={{
+              width: "800px",
+              height: "100%",
+              marginLeft: "50px",
+            }}
+          >
+            <Collapse
+              items={[
+                {
+                  key: "1",
+                  label: (
+                    <p
+                      style={{
+                        fontSize: 22,
+                      }}
+                    >
+                      White
+                    </p>
+                  ),
+                  children: (
+                    <div>
+                      <Card
+                        style={{
+                          marginTop: 16,
+                          fontSize: 22,
+                          textAlign: "left",
+                        }}
+                        type="inner"
+                        title="ERC20 Id: 1"
+                      >
+                        Name: Token 1<br></br>
+                        Symbol: T1
+                        <br></br>
+                        Owner: <Tag color="green">45c4ce9d...ae8a28ec</Tag>
+                        <br></br>
+                        Balance:{" "}
+                        <Tag style={{ fontSize: 20 }} color="green">
+                          {BigInt(tokens.erc20.white).toString()}
+                        </Tag>
+                      </Card>
+                      <h2>ERC721</h2>
+                      <List
+                        grid={{ gutter: 16, column: 5 }}
+                        dataSource={tokens.erc721.white}
+                        renderItem={(item: any) => (
+                          <List.Item>
+                            <Card
+                              style={{
+                                marginTop: 10,
+                                fontSize: 20,
+                                textAlign: "left",
+                              }}
+                              cover={
+                                <img
+                                  alt="example"
+                                  src={`/${BigInt(item.node.nftId)}.png`}
+                                  style={{ width: 250 }}
+                                />
+                              }
+                              type="inner"
+                              title={`ERC721 Id: ${item.node.id}`}
+                            >
+                              Collection: {item.node.id}
+                              <br></br>
+                              tokenId: {item.node.nftId}
+                              <br></br>
+                              Owner:{" "}
+                              <Tag color="blue">
+                                {sha256(
+                                  item.node.owner + item.node.ownerType
+                                ).slice(0, 8)}
+                                ...
+                                {sha256(
+                                  item.node.owner + item.node.ownerType
+                                ).slice(-8)}
+                              </Tag>
+                            </Card>
+                          </List.Item>
+                        )}
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  key: "2",
+                  label: (
+                    <p
+                      style={{
+                        fontSize: 22,
+                      }}
+                    >
+                      Black
+                    </p>
+                  ),
+                  children: (
+                    <div>
+                      <Card
+                        style={{
+                          marginTop: 16,
+                          fontSize: 22,
+                          textAlign: "left",
+                        }}
+                        type="inner"
+                        title="ERC20 Id: 1"
+                      >
+                        Name: Token 1<br></br>
+                        Symbol: T1
+                        <br></br>
+                        Owner: <Tag color="green">e51b4a65...f390c229</Tag>
+                        <br></br>
+                        Balance:{" "}
+                        <Tag style={{ fontSize: 20 }} color="green">
+                          {BigInt(tokens.erc20.black).toString()}
+                        </Tag>
+                      </Card>
+                      <h2>ERC721</h2>
+                      <List
+                        grid={{ gutter: 16, column: 5 }}
+                        dataSource={tokens.erc721.black}
+                        renderItem={(item: any) => (
+                          <List.Item>
+                            <Card
+                              style={{
+                                marginTop: 10,
+                                fontSize: 20,
+                                textAlign: "left",
+                              }}
+                              cover={
+                                <img
+                                  alt="example"
+                                  src={`/${BigInt(item.node.nftId)}.png`}
+                                  style={{ width: 250 }}
+                                />
+                              }
+                              type="inner"
+                              title={`ERC721 Id: ${item.node.id}`}
+                            >
+                              Collection: {item.node.id}
+                              <br></br>
+                              tokenId: {item.node.nftId}
+                              <br></br>
+                              Owner:{" "}
+                              <Tag color="blue">
+                                {sha256(
+                                  item.node.owner + item.node.ownerType + "a"
+                                ).slice(0, 8)}
+                                ...
+                                {sha256(
+                                  item.node.owner + item.node.ownerType
+                                ).slice(-8)}
+                              </Tag>
+                            </Card>
+                          </List.Item>
+                        )}
+                      />
+                    </div>
+                  ),
+                },
+              ]}
+              defaultActiveKey={["1"]}
             />
           </div>
-        )}
+        </div>
+        <br></br>
+        <br></br>
+        <br></br>
+
+        <h1 className="text-3xl text-center">Wallets</h1>
+        <br></br>
+
+        {/* <pre>
+          {JSON.stringify(tokens, null, 2)}
+        </pre> */}
       </div>
     </div>
   );
