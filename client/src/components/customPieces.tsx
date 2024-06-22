@@ -32,7 +32,7 @@ const customPieces = (
 ) => {
   const returnPieces: any = {};
   pieces.map((p) => {
-    returnPieces[p] = ({ squareWidth }: any) => (
+    returnPieces[p] = ({ squareWidth, sourceSquare }: any) => (
       <Popover
         trigger="click"
         title={"Wrapping " + selectedPiece + " "}
@@ -62,7 +62,8 @@ const customPieces = (
                       }}
                       options={
                         (() =>
-                          selectedPiece.includes("w")
+                          // selectedPiece.includes("w")
+                          selectedPiece > 32
                             ? tokens?.erc721?.white
                             : tokens?.erc721?.black)().map(
                           (item: any, index: any) => {
@@ -91,17 +92,17 @@ const customPieces = (
                       disabled={false}
                       onClick={async () => {
                         console.log("ride", {
-                          fenPos: boardNotationToFen[selectedPiece],
+                          fenPos: selectedPiece,
                           nftRideId: Number(selectToRide),
                         });
                         client.actions.ride_piece({
                           account,
-                          fenPos: boardNotationToFen[selectedPiece],
+                          fenPos: selectedPiece,
                           nftRideId: Number(selectToRide),
                         });
                       }}
                     >
-                      Ride {selectedPiece}
+                      Ride
                     </Button>
                   </Space >
               }
@@ -111,15 +112,15 @@ const customPieces = (
                   <Avatar
                     size={80}
                     src={`http://localhost:5173/${Number(
-                      nftIds[boardNotationToFen[selectedPiece]]
+                      nftIds[selectedPiece]
                     )}.png`}
                   />
                 }
                 description={
                   "balance " +
-                  balances[boardNotationToFen[selectedPiece]] +
+                  balances[selectedPiece] +
                   " nftId " +
-                  Number(nftIds[boardNotationToFen[selectedPiece]])
+                  Number(nftIds[selectedPiece])
                 }
                 // description="This is the degenchess piece you want your NFT to ride"
               />
@@ -133,15 +134,17 @@ const customPieces = (
             height: squareWidth,
             backgroundImage: `url(/${p}.png)`,
             backgroundSize: "100%",
+            // make it 80% transparent
+            opacity: 0.7,
           }}
         >
           {/* <Avatar
             style={{
               marginRight: "50%",
             }}
-            src={`http://localhost:5173/${Number(nftIds[boardNotationToFen[p]])}.png`}
+            // src={`http://localhost:5173/${Number(nftIds[boardNotationToFen[p]])}.png`}
             shape="square"
-          >{p}</Avatar> */}
+          >{sourceSquare? sourceSquare[0]: 'nn'}</Avatar> */}
         </div>
       </Popover>
     );

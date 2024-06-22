@@ -9,7 +9,7 @@ import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 import customPieces from "./components/customPieces";
-import { boardNotation } from "./utils";
+import { boardNotation, chessboardNotation } from "./utils";
 import { Card, Collapse, List, Tag } from "antd";
 // sha256
 import sha256 from "sha256";
@@ -176,7 +176,7 @@ function App() {
   const [gamePos, setGamePos] = useState<any>("");
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [selectIcon, setSelectedIcon] = useState<string>("");
-  const [selectedPiece, setSelectedPiece] = useState<string>("");
+  const [selectedPiece, setSelectedPiece] = useState<any>("");
   const [selectToRide, setSelectToRide] = useState<string>();
   const [positions, setPositions] = useState(boardNotation);
   const [tokenBalance, setTokenBalance] = useState<any>(null);
@@ -311,6 +311,33 @@ function App() {
     }
   };
 
+  const generateCustomSquareStyles = (nftIds: any, balances: any) => {
+    const customSquareStyles = {} as any;
+  
+    nftIds.forEach((nftId: any, index: any) => {
+      const square = chessboardNotation[index];
+      const id = Number(nftId);
+      if (id === 0) {
+        return;
+      }
+      customSquareStyles[square] = {
+        backgroundImage: `url(http://localhost:5173/${id}.png)`,
+        backgroundSize: "60%",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      };
+  
+      if (balances[index] > 0) {
+        customSquareStyles[square].border = "2px solid yellow";
+      }
+
+      console.log("customSquareStyles", customSquareStyles);
+
+    });
+  
+    return customSquareStyles;
+  };
+
   useEffect(() => {
     const fetchAndSetGamePos = async () => {
       const { fenString, nftIds, tokenQuantities } = await fetchCells();
@@ -350,7 +377,7 @@ function App() {
     // check key inside final object that has value of square and return the key
     let piece = Object.keys(positions).find((key) => positions[key] === square);
     console.log("piece", piece);
-    setSelectedPiece(piece || "");
+    setSelectedPiece(chessPositionToIndex(square));
   }
 
   const {
@@ -372,26 +399,6 @@ function App() {
   );
 
   const board = useComponentValue(Board, playerQuery[0]);
-  // const fenRepr = useComponentValue(Cell, getEntityIdFromKeys([BigInt(0)]));
-  // let fenString = "-".repeat(64);
-  // for (let i = 0; i < 64; i++) {
-  //   // eslint-disable-next-line react-hooks/rules-of-hooks
-  //   const cell = useComponentValue(Cell, getEntityIdFromKeys([BigInt(i)]));
-  //   fenString = fenString.slice(0, i) + cell?.value[0] + fenString.slice(i + 1);
-  // }
-
-  // const [fetch, setFetch] = useState(false);
-  // useState<"red" | "blue">("red");
-
-  // const grid = useMemo(() => {
-  //   const board = [];
-  //   for (let col = 0; col < 64; col++) {
-  //     board.push(<CellBoard key={`${col}`} fenPos={col} />);
-  //   }
-  //   return board;
-  // }, [fetch]);
-
-  // console.log(Number(player?.last_action.toString()) || 0);
 
   return (
     <div className="container mx-auto">
@@ -453,6 +460,10 @@ function App() {
                   margin: "0 auto",
                   borderRadius: "10px",
                 }}
+                arePiecesDraggable={isGameStarted}
+                customSquareStyles={
+                  generateCustomSquareStyles(nftIds, balances)
+                }
                 id="BasicBoard"
                 boardWidth={700}
                 position={
