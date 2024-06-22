@@ -301,10 +301,12 @@ mod actions {
             let tokenQuantity = cell_to.tokenQuantity;
 
             cell_to.value = cell_from.value;
+            cell_to.nftRideId = cell_from.nftRideId;
+            cell_to.tokenQuantity = cell_from.tokenQuantity;
             cell_from.value = Type::Empty;
 
             if nftCaptureId != 0 {
-                let mut nft = get!(world, (1,PlayerType::Board,nftCaptureId), ERC721);
+                let mut nft = get!(world, nftCaptureId, ERC721);
                 let mut playerType = PlayerType::White;
                 if board.turn == true {
                     playerType = PlayerType::Black;
@@ -319,10 +321,12 @@ mod actions {
                 if board.turn == true {
                     playerType = PlayerType::Black;
                 }
-                let mut erc20Player = get!(world, (1,player,playerType), ERC20);
+                let mut erc20Player = get!(world, playerType, ERC20);
                 erc20Player.balance = erc20Player.balance + tokenQuantity;
                 set!(world, (erc20Player));
             }
+
+
 
             if board.turn == false {
                 set!(world, (
@@ -349,9 +353,6 @@ mod actions {
                     },
                  cell_from, cell_to));
             }
-
-
-
         }
 
         fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64) {
@@ -374,21 +375,20 @@ mod actions {
             // }
 
             let mut playerType = PlayerType::White;
-            if fenPos < 32 {
+            if fenPos > 32 {
                 playerType = PlayerType::Black;
             }
 
             // check the nft belongs to the player
-            let mut nft = get!(world, (1,player,playerType,nftRideId), ERC721);
-            if nft.owner != player {
-                return ();
-            }
+            let mut nft = get!(world, nftRideId, ERC721);
+            // if nft.owner != player {
+            //     return ();
+            // }
 
             let mut cell = get!(world, fenPos, Cell);
             cell.nftRideId = nftRideId;
 
             nft.ownerType = PlayerType::Board;
-            // nft.owner = ContractAddress::new(0);
 
             set!(world, (nft));
 
@@ -412,7 +412,7 @@ mod actions {
                 playerType = PlayerType::Black;
             }
 
-            let mut erc20Player = get!(world, (1,player,playerType), ERC20);
+            let mut erc20Player = get!(world, playerType, ERC20);
             if erc20Player.owner != player {
                 return ();
             }
