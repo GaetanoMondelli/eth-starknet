@@ -1,5 +1,13 @@
 use starknet::ContractAddress;
 
+#[derive(Serde, Copy, Drop, Introspect, PartialEq)]
+enum PlayerType {
+    White,
+    Black,
+    Board,
+} 
+
+
 trait TypeTrait {
     fn is_white(self: Type) -> bool;
     fn is_black(self: Type) -> bool;
@@ -131,9 +139,6 @@ impl TypeIntoFelt252 of Into<Type, felt252> {
     }
 }
 
-
-
-
 #[derive(Serde, Copy, Drop, Introspect)]
 #[dojo::model]
 struct Cell {
@@ -142,6 +147,32 @@ struct Cell {
     value: Type,
     nftRideId: u64,
     tokenQuantity: u64,
+}
+
+#[derive(Serde, Copy, Drop, Introspect)]
+#[dojo::model]
+struct ERC20 {
+    #[key]
+    id: u64,
+    #[key]
+    owner: ContractAddress,
+    #[key]
+    ownerType: PlayerType,
+    balance: u64,
+}
+
+#[derive(Serde, Copy, Drop, Introspect)]
+#[dojo::model]
+struct ERC721 {
+    #[key]
+    id: u64,
+    #[key]
+    owner: ContractAddress,
+    #[key]
+    ownerType: PlayerType,
+    #[key]
+    nftId: u64,
+    attribute: u64,
 }
 
 #[derive(Copy, Drop, Serde)]

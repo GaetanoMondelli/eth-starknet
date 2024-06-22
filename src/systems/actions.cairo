@@ -1,6 +1,10 @@
 use dojo_starter::models::board::{Board};
 use dojo_starter::models::board::{Cell};
 use dojo_starter::models::board::{Type};
+use dojo_starter::models::board::{ERC20};
+use dojo_starter::models::board::{ERC721};
+use dojo_starter::models::board::{PlayerType};
+
 
 
 
@@ -9,7 +13,8 @@ use dojo_starter::models::board::{Type};
 trait IActions {
     fn spawn(ref world: IWorldDispatcher);
     fn move_piece(ref world: IWorldDispatcher, from: u64, to: u64);
-    fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64, tokenQuantity: u64);
+    fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64);
+    fn assign_tokens(ref world: IWorldDispatcher, fenPos: u64, tokenQuantity: u64);
     fn startGame(ref world: IWorldDispatcher);
 }
 
@@ -20,7 +25,7 @@ mod actions {
     use super::{IActions};
     use starknet::{ContractAddress, get_caller_address};
     use dojo_starter::models::{
-        board::{Board, Cell, Type, TypeTrait},
+        board::{Board, Cell, Type, TypeTrait, ERC20, ERC721, PlayerType},
     };
 
     #[abi(embed_v0)]
@@ -42,6 +47,71 @@ mod actions {
                     },
                 )
             );
+
+
+            // assign erc20 tokens to the players
+            set!(
+                world,
+                (
+                    ERC20 {
+                        id: 1,
+                        owner: player,
+                        ownerType: PlayerType::White,
+                        balance: 1000,
+                    },
+                )
+            );
+
+            set!(
+                world,
+                (
+                    ERC20 {
+                        id: 1,
+                        owner: player,
+                        ownerType: PlayerType::Black,
+                        balance: 1000,
+                    },
+                )
+            );
+
+            // assign 5 erc721 tokens to the players
+
+            let mut j: u64 = 1;
+
+            loop {
+                if j >= 6 { // Break condition
+                    break ();
+                }
+
+                set!(
+                    world,
+                    (
+                        ERC721 {
+                            id: 1,
+                            owner: player,
+                            ownerType: PlayerType::White,
+                            nftId: j,
+                            attribute: j*10,
+                        },
+                    )
+                );
+
+                set!(
+                    world,
+                    (
+                        ERC721 {
+                            id: 1,
+                            owner: player,
+                            ownerType: PlayerType::Black,
+                            nftId: j + 5,
+                            attribute: j*5,
+                        },
+                    )
+                );
+
+                j = j + 1;
+            };
+
 
             let mut i: u64 = 0;
 
@@ -227,8 +297,32 @@ mod actions {
 
             
             // UNCOMMENT FOR REMOVING CONSTRAINTS
+            let mut nftCaptureId = cell_to.nftRideId;
+            let tokenQuantity = cell_to.tokenQuantity;
+
             cell_to.value = cell_from.value;
             cell_from.value = Type::Empty;
+
+            if nftCaptureId != 0 {
+                let mut nft = get!(world, (1,PlayerType::Board,nftCaptureId), ERC721);
+                let mut playerType = PlayerType::White;
+                if board.turn == true {
+                    playerType = PlayerType::Black;
+                }
+                nft.owner = player;
+                nft.ownerType = playerType;
+                set!(world, (nft));
+            }
+
+            if tokenQuantity != 0 {
+                let mut playerType = PlayerType::White;
+                if board.turn == true {
+                    playerType = PlayerType::Black;
+                }
+                let mut erc20Player = get!(world, (1,player,playerType), ERC20);
+                erc20Player.balance = erc20Player.balance + tokenQuantity;
+                set!(world, (erc20Player));
+            }
 
             if board.turn == false {
                 set!(world, (
@@ -260,7 +354,7 @@ mod actions {
 
         }
 
-        fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64, tokenQuantity: u64) {
+        fn ride_piece(ref world: IWorldDispatcher, fenPos: u64, nftRideId: u64) {
             let board = get!(world, 1, Board);
             if board.is_started == true {
                 return ();
@@ -268,8 +362,8 @@ mod actions {
             if board.is_finished {
                 return ();
             }
-
-            // let player = get_caller_address();
+            
+            let player = get_caller_address();
 
             // if board.white_player == player && fenPos > 16 {
             //     return ();
@@ -279,12 +373,58 @@ mod actions {
             //     return ();
             // }
 
+            let mut playerType = PlayerType::White;
+            if fenPos < 32 {
+                playerType = PlayerType::Black;
+            }
+
+            // check the nft belongs to the player
+            let mut nft = get!(world, (1,player,playerType,nftRideId), ERC721);
+            if nft.owner != player {
+                return ();
+            }
+
             let mut cell = get!(world, fenPos, Cell);
             cell.nftRideId = nftRideId;
-            cell.tokenQuantity = tokenQuantity;
+
+            nft.ownerType = PlayerType::Board;
+            // nft.owner = ContractAddress::new(0);
+
+            set!(world, (nft));
 
             set!(world, (cell));
+        }
 
+        fn assign_tokens(ref world: IWorldDispatcher, fenPos: u64, tokenQuantity: u64) {
+            let board = get!(world, 1, Board);
+            if board.is_started == true {
+                return ();
+            }
+
+            if board.is_finished {
+                return ();
+            }
+
+            let player = get_caller_address();
+
+            let mut playerType = PlayerType::White;
+            if fenPos < 32 {
+                playerType = PlayerType::Black;
+            }
+
+            let mut erc20Player = get!(world, (1,player,playerType), ERC20);
+            if erc20Player.owner != player {
+                return ();
+            }
+            if erc20Player.balance < tokenQuantity {
+                return ();
+            }
+            erc20Player.balance = erc20Player.balance - tokenQuantity;
+            set!(world, (erc20Player));
+
+            let mut cell = get!(world, fenPos, Cell);
+            cell.tokenQuantity = tokenQuantity;
+            set!(world, (cell));
         }
 
         fn startGame(ref world: IWorldDispatcher) {

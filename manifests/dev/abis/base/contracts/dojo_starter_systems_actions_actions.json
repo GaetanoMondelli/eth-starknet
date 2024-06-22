@@ -96,6 +96,18 @@
           {
             "name": "nftRideId",
             "type": "core::integer::u64"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "assign_tokens",
+        "inputs": [
+          {
+            "name": "fenPos",
+            "type": "core::integer::u64"
           },
           {
             "name": "tokenQuantity",

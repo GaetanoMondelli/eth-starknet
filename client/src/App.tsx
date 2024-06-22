@@ -10,7 +10,6 @@ import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 import customPieces from "./components/customPieces";
 import { boardNotation } from "./utils";
-import { set } from "mobx";
 
 function chessPositionToIndex(pos) {
   // Extract the column (letter) and row (number)
