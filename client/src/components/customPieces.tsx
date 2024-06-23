@@ -7,6 +7,7 @@ import {
   Select,
   Space,
   InputNumber,
+  Tag,
 } from "antd";
 import { boardNotationToFen } from "../utils";
 
@@ -120,41 +121,42 @@ const customPieces = (
                     </Button>
                   </Space>
                 ),
-                <Space style={{ marginTop: "13px", marginBottom: "13px" }}>
-                  <InputNumber
-                    disabled={Number(balances[selectedPiece]) !== 0}
-                    max={
-                      selectedPiece > 32
-                        ? Number(whiteBalance)
-                        : Number(blackBalance)
-                    }
-                    onChange={(value) => {
-                      setQuantityToDeposit(value);
-                    }}
-                    min={1}
-                    defaultValue={0}
-                  ></InputNumber>
-                  <Button
-                    disabled={false
-                    }
-                    onClick={async () => {
-                      console.log(
-                        "deposit",
-                        account,
-                        selectedPiece,
-                        quantityToDeposit
-                      );
-                      const result = await client.actions.assign_tokens({
-                        account,
-                        fenPos: selectedPiece,
-                        tokenQuantity: quantityToDeposit,
-                      });
-                      console.log("result", result);
-                    }}
-                  >
-                    Deposit Tokens
-                  </Button>
-                </Space>,
+                !isGameStarted && (
+                  <Space style={{ marginTop: "13px", marginBottom: "13px" }}>
+                    <InputNumber
+                      disabled={Number(balances[selectedPiece]) !== 0}
+                      max={
+                        selectedPiece > 32
+                          ? Number(whiteBalance)
+                          : Number(blackBalance)
+                      }
+                      onChange={(value) => {
+                        setQuantityToDeposit(value);
+                      }}
+                      min={1}
+                      defaultValue={0}
+                    ></InputNumber>
+                    <Button
+                      disabled={false}
+                      onClick={async () => {
+                        console.log(
+                          "deposit",
+                          account,
+                          selectedPiece,
+                          quantityToDeposit
+                        );
+                        const result = await client.actions.assign_tokens({
+                          account,
+                          fenPos: selectedPiece,
+                          tokenQuantity: quantityToDeposit,
+                        });
+                        console.log("result", result);
+                      }}
+                    >
+                      Deposit Tokens
+                    </Button>
+                  </Space>
+                ),
               ]}
             >
               <Card.Meta
@@ -167,10 +169,27 @@ const customPieces = (
                   />
                 }
                 description={
-                  "balance " +
-                  balances[selectedPiece] +
-                  " nftId " +
-                  Number(nftIds[selectedPiece])
+                  <>
+                    {Number(balances[selectedPiece]) === 0 ? (
+                      "No tokens deposited"
+                    ) : (
+                      <>
+                        <b>Token balance:</b>{" "}
+                        <Tag style={{ fontSize: "1.3em" }} color="green">
+                          {Number(balances[selectedPiece])}
+                        </Tag>
+                      </>
+                    )}
+                    <br />
+
+                    {Number(nftIds[selectedPiece]) === 0 ? (
+                      "No NFT"
+                    ) : (
+                      <>
+                        <b> NFTId</b> <Tag>{Number(nftIds[selectedPiece])}</Tag>
+                      </>
+                    )}
+                  </>
                 }
                 // description="This is the degenchess piece you want your NFT to ride"
               />

@@ -544,6 +544,10 @@ function App() {
                             game.turn() === "w" ? "b" : "w"
                           )
                         );
+
+                        const tokens = await fetchTokens();
+                        setTokens(tokens as any);
+
                         setLoading(false);
                       }, 800);
                     })
