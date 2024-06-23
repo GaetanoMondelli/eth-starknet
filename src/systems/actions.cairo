@@ -55,6 +55,7 @@ mod actions {
                 (
                     ERC20 {
                         id: 1,
+                        addressId: 0,
                         owner: player,
                         ownerType: PlayerType::White,
                         balance: 1000,
@@ -67,6 +68,7 @@ mod actions {
                 (
                     ERC20 {
                         id: 1,
+                        addressId: 1,
                         owner: player,
                         ownerType: PlayerType::Black,
                         balance: 1000,
@@ -322,11 +324,15 @@ mod actions {
             }
 
             if tokenQuantity != 0 {
-                let mut playerType = PlayerType::White;
+                // let mut playerType = PlayerType::White;
+                // if board.turn == true {
+                //     playerType = PlayerType::Black;
+                // }
+                let mut addressId = 0;
                 if board.turn == true {
-                    playerType = PlayerType::Black;
+                    addressId = 1;
                 }
-                let mut erc20Player = get!(world, playerType, ERC20);
+                let mut erc20Player = get!(world, addressId, ERC20);
                 erc20Player.balance = erc20Player.balance + tokenQuantity;
                 set!(world, (erc20Player));
             }
@@ -401,13 +407,13 @@ mod actions {
 
         fn assign_tokens(ref world: IWorldDispatcher, fenPos: u64, tokenQuantity: u64) {
             let board = get!(world, 1, Board);
-            if board.is_started == true {
-                return ();
-            }
+            // if board.is_started == true {
+            //     return ();
+            // }
 
-            if board.is_finished {
-                return ();
-            }
+            // if board.is_finished {
+            //     return ();
+            // }
 
             // let player = get_caller_address();
 
@@ -416,7 +422,13 @@ mod actions {
                 playerType = PlayerType::White;
             }
 
-            let mut erc20Player = get!(world, playerType, ERC20);
+            let mut addressId = 1;
+            if fenPos > 32 {
+                addressId = 0;
+            }
+            
+
+            let mut erc20Player = get!(world, addressId, ERC20);
             // if erc20Player.owner != player {
             //     return ();
             // }
@@ -426,9 +438,9 @@ mod actions {
             erc20Player.balance = erc20Player.balance - tokenQuantity;
             set!(world, (erc20Player));
 
-            let mut cell = get!(world, fenPos, Cell);
-            cell.tokenQuantity = tokenQuantity;
-            set!(world, (cell));
+            // let mut cell = get!(world, fenPos, Cell);
+            // cell.tokenQuantity = tokenQuantity;
+            // set!(world, (cell));
         }
 
         fn startGame(ref world: IWorldDispatcher) {

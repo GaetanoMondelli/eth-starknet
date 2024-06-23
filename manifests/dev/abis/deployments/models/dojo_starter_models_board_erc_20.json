@@ -345,6 +345,10 @@
     "name": "dojo_starter::models::board::ERC20",
     "members": [
       {
+        "name": "addressId",
+        "type": "core::integer::u64"
+      },
+      {
         "name": "ownerType",
         "type": "dojo_starter::models::board::PlayerType"
       },

@@ -135,7 +135,8 @@ const customPieces = (
                     defaultValue={0}
                   ></InputNumber>
                   <Button
-                    disabled={false}
+                    disabled={false
+                    }
                     onClick={async () => {
                       console.log(
                         "deposit",
@@ -146,7 +147,7 @@ const customPieces = (
                       const result = await client.actions.assign_tokens({
                         account,
                         fenPos: selectedPiece,
-                        tokenQuantity: "100",
+                        tokenQuantity: quantityToDeposit,
                       });
                       console.log("result", result);
                     }}

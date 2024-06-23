@@ -76,7 +76,7 @@ export async function setupWorld(provider: DojoProvider) {
       try {
         return await provider.execute(account, {
           contractName: "actions",
-          entrypoint: "ride_piece",
+          entrypoint: "assign_tokens",
           calldata: [fenPos, tokenQuantity],
         });
       } catch (error) {

@@ -7,6 +7,7 @@ enum PlayerType {
     Board,
 } 
 
+
 impl PlayerTypeIntoFelt252 of Into<PlayerType, felt252> {
     fn into(self: PlayerType) -> felt252 {
         match self {
@@ -162,6 +163,7 @@ struct Cell {
 #[dojo::model]
 struct ERC20 {
     #[key]
+    addressId: u64,
     ownerType: PlayerType,
     // #[key]
     id: u64,

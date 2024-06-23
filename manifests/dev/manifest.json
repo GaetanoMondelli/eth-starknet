@@ -1020,8 +1020,8 @@
     {
       "kind": "DojoContract",
       "address": "0x3610b797baec740e2fa25ae90b4a57d92b04f48a1fdbae1ae203eaf9723c1a0",
-      "class_hash": "0x4f24837592c38732726a009ccb17db26d6522db78b37d22d3cf625a60530542",
-      "original_class_hash": "0x4f24837592c38732726a009ccb17db26d6522db78b37d22d3cf625a60530542",
+      "class_hash": "0x267cbc979fa0213b3ec98a1d61fbb976ced91a47bfa0d859662ddd27e949912",
+      "original_class_hash": "0x267cbc979fa0213b3ec98a1d61fbb976ced91a47bfa0d859662ddd27e949912",
       "base_class_hash": "0x22f3e55b61d86c2ac5239fa3b3b8761f26b9a5c0b5f61ddbd5d756ced498b46",
       "abi": [
         {
@@ -2142,9 +2142,14 @@
       "kind": "DojoModel",
       "members": [
         {
+          "name": "addressId",
+          "type": "u64",
+          "key": true
+        },
+        {
           "name": "ownerType",
           "type": "PlayerType",
-          "key": true
+          "key": false
         },
         {
           "name": "id",
@@ -2162,8 +2167,8 @@
           "key": false
         }
       ],
-      "class_hash": "0x28e57678137ddcfc69a3ae9e6b6ec928ffb85a2c28eab05fce0fa824e220e3",
-      "original_class_hash": "0x28e57678137ddcfc69a3ae9e6b6ec928ffb85a2c28eab05fce0fa824e220e3",
+      "class_hash": "0x3be5f9012609ec748335ea03b389b0baed935b2587ebca64b688da1f01c5e9",
+      "original_class_hash": "0x3be5f9012609ec748335ea03b389b0baed935b2587ebca64b688da1f01c5e9",
       "abi": [
         {
           "type": "impl",
@@ -2510,6 +2515,10 @@
           "type": "struct",
           "name": "dojo_starter::models::board::ERC20",
           "members": [
+            {
+              "name": "addressId",
+              "type": "core::integer::u64"
+            },
             {
               "name": "ownerType",
               "type": "dojo_starter::models::board::PlayerType"

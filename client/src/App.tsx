@@ -203,6 +203,7 @@ function App() {
         body: JSON.stringify({ query: queryTokens }),
       });
       const result = await response.json();
+      console.log("FETCH-tokens", result);
 
       if (result.errors) {
         throw new Error(result.errors.map((e: any) => e.message).join(", "));
