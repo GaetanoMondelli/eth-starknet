@@ -46,3 +46,87 @@ Endpoints:
 - CHANGE THE RPC_URL TO CONNECT TO https://api.cartridge.gg/x/degenchess/katana instead of "http://localhost:5050/"
 [tool.dojo.env]
 rpc_url = ["YOUR_NEW_RPC_URL"](https://api.cartridge.gg/x/degenchess/katana)
+
+
+# USEFUL STATE QUERIES
+
+{
+  boardModels(where: { idEQ: "1" }) {
+    edges {
+      node {
+        id
+        white_player
+        black_player
+        turn
+        is_finished
+        is_started
+        winner
+        entity {
+          id
+          __typename
+        }
+      }
+      cursor
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+
+
+{
+  cellModels(where: { fenPosGTE: "0", fenPosLTE: "63" }, first: 64) {
+    edges {
+      node {
+        fenPos
+        value
+        entity {
+          id
+          __typename
+        }
+      }
+      cursor
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+
+
+{
+  erc721Models(
+    first: 10,
+    where: { id: "1" }
+  ) {
+    edges {
+      node {
+        id
+        owner
+        nftId
+        ownerType
+      }
+    }
+  }
+  erc20Models(
+    where: { id: "1" } 
+  ) {
+    edges {
+      node {
+        id
+        owner
+        ownerType
+        balance
+      }
+    }
+  }
+}
