@@ -275,23 +275,27 @@ function App() {
         throw new Error(result.errors.map((e) => e.message).join(", "));
       }
 
-      console.log("FETCH-cells", result.data.cellModels.edges.sort(
-        (a: { node: { fenPos: number; }; }, b: { node: { fenPos: number; }; }) => a.node.fenPos - b.node.fenPos
-      ));
+      console.log(
+        "FETCH-cells",
+        result.data.cellModels.edges.sort(
+          (a: { node: { fenPos: number } }, b: { node: { fenPos: number } }) =>
+            a.node.fenPos - b.node.fenPos
+        )
+      );
 
       const nftIds = result.data.cellModels.edges
-      .map((edge: { node: any }) => edge.node)
-      .sort(
-        (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
-      )
-      .map((cell: any) => cell.nftRideId);
+        .map((edge: { node: any }) => edge.node)
+        .sort(
+          (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
+        )
+        .map((cell: any) => cell.nftRideId);
 
       const tokenQuantities = result.data.cellModels.edges
-      .map((edge: { node: any }) => edge.node)
-      .sort(
-        (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
-      )
-      .map((cell: any) => cell.tokenQuantity);
+        .map((edge: { node: any }) => edge.node)
+        .sort(
+          (a: { fenPos: number }, b: { fenPos: number }) => a.fenPos - b.fenPos
+        )
+        .map((cell: any) => cell.tokenQuantity);
 
       const cells = result.data.cellModels.edges
         .map((edge: { node: any }) => edge.node)
@@ -316,28 +320,32 @@ function App() {
 
   const generateCustomSquareStyles = (nftIds: any, balances: any) => {
     const customSquareStyles = {} as any;
-  
+
     nftIds.forEach((nftId: any, index: any) => {
       const square = chessboardNotation[index];
       const id = Number(nftId);
-      if (id === 0) {
-        return;
+      if (id !== 0) {
+        customSquareStyles[square] = {
+          backgroundImage: `url(http://localhost:5173/${id}.png)`,
+          backgroundSize: "60%",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        };
       }
-      customSquareStyles[square] = {
-        backgroundImage: `url(http://localhost:5173/${id}.png)`,
-        backgroundSize: "60%",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      };
-  
-      if (balances[index] > 0) {
-        customSquareStyles[square].border = "2px solid yellow";
+
+      if (Number(balances[index]) > 0) {
+        // console.log("balance", balances[index], index);
+        if(customSquareStyles[square]){
+          customSquareStyles[square].border = "3px solid yellow";
+        }
+        else{
+          customSquareStyles[square] = { border: "5px solid yellow" };
+        }
       }
 
       console.log("customSquareStyles", customSquareStyles);
-
     });
-  
+
     return customSquareStyles;
   };
 
@@ -349,7 +357,7 @@ function App() {
 
       setNftdIds(nftIds);
       setBalances(tokenQuantities);
-      setCustomSquareStyles(generateCustomSquareStyles(nftIds, balances))
+      setCustomSquareStyles(generateCustomSquareStyles(nftIds, tokenQuantities));
 
       const tokens = await fetchTokens();
       setTokens(tokens as any);
@@ -442,7 +450,7 @@ function App() {
             </button>
             <br></br>
 
-            <pre>{JSON.stringify(balances, null, 2)}</pre> 
+            <pre>{JSON.stringify(balances, null, 2)}</pre>
 
             <br></br>
             <br></br>
@@ -517,16 +525,18 @@ function App() {
                       setLoading(true);
                       // Delay before fetching cells
                       setTimeout(async () => {
-                        const { fenString, nftIds, tokenQuantities } = await fetchCells();
+                        const { fenString, nftIds, tokenQuantities } =
+                          await fetchCells();
                         console.log(
                           "fenString",
                           convertCustomFenToStandard(fenString || "")
                         );
 
                         setNftdIds(nftIds);
-                        
                         setBalances(tokenQuantities);
-                        setCustomSquareStyles(generateCustomSquareStyles(nftIds, balances))
+                        setCustomSquareStyles(
+                          generateCustomSquareStyles(nftIds, tokenQuantities)
+                        );
 
                         setGamePos(
                           convertCustomFenToStandard(
