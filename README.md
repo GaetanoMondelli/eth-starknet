@@ -50,6 +50,9 @@ rpc_url = ["YOUR_NEW_RPC_URL"](https://api.cartridge.gg/x/degenchess/katana)
 
 # USEFUL STATE QUERIES
 
+Get the Board-Game state:
+
+```
 {
   boardModels(where: { idEQ: "1" }) {
     edges {
@@ -77,8 +80,11 @@ rpc_url = ["YOUR_NEW_RPC_URL"](https://api.cartridge.gg/x/degenchess/katana)
     }
   }
 }
+```
 
+Get the all chessboard with fen notation (first 64 cells, i.e. all cells)
 
+```
 {
   cellModels(where: { fenPosGTE: "0", fenPosLTE: "63" }, first: 64) {
     edges {
@@ -101,8 +107,11 @@ rpc_url = ["YOUR_NEW_RPC_URL"](https://api.cartridge.gg/x/degenchess/katana)
     }
   }
 }
+```
 
+Get the state and balance of the NFTs and ERC20 tokens
 
+```
 {
   erc721Models(
     first: 10,
@@ -130,3 +139,5 @@ rpc_url = ["YOUR_NEW_RPC_URL"](https://api.cartridge.gg/x/degenchess/katana)
     }
   }
 }
+
+```
