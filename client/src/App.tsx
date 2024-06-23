@@ -182,6 +182,8 @@ function App() {
   const [tokenBalance, setTokenBalance] = useState<any>(null);
   const [nftIds, setNftdIds] = useState<any>([]);
   const [balances, setBalances] = useState<any>([]);
+  const [customSquareStyles, setCustomSquareStyles] = useState<any>({});
+  const [quantityToDeposit, setQuantityToDeposit] = useState<number>(0);
 
   const [tokens, setTokens] = useState({
     erc20: { white: 0, black: 0 },
@@ -346,6 +348,7 @@ function App() {
 
       setNftdIds(nftIds);
       setBalances(tokenQuantities);
+      setCustomSquareStyles(generateCustomSquareStyles(nftIds, balances))
 
       const tokens = await fetchTokens();
       setTokens(tokens as any);
@@ -437,8 +440,8 @@ function App() {
               Start Game
             </button>
             <br></br>
-            {/* <pre>{JSON.stringify(board, null, 2)}</pre>
-            <pre>{JSON.stringify(nftIds, null, 2)}</pre> */}
+
+            <pre>{JSON.stringify(balances, null, 2)}</pre> 
 
             <br></br>
             <br></br>
@@ -461,9 +464,7 @@ function App() {
                   borderRadius: "10px",
                 }}
                 arePiecesDraggable={isGameStarted}
-                customSquareStyles={
-                  generateCustomSquareStyles(nftIds, balances)
-                }
+                customSquareStyles={customSquareStyles}
                 id="BasicBoard"
                 boardWidth={700}
                 position={
@@ -481,7 +482,11 @@ function App() {
                   nftIds,
                   balances,
                   fetchCells,
-                  isGameStarted
+                  isGameStarted,
+                  tokens.erc20.white,
+                  tokens.erc20.black,
+                  setQuantityToDeposit,
+                  quantityToDeposit
                 )}
                 onPieceDrop={(from, to) => {
                   console.log("move", from, to);
@@ -511,11 +516,16 @@ function App() {
                       setLoading(true);
                       // Delay before fetching cells
                       setTimeout(async () => {
-                        const { fenString } = await fetchCells();
+                        const { fenString, nftIds, tokenQuantities } = await fetchCells();
                         console.log(
                           "fenString",
                           convertCustomFenToStandard(fenString || "")
                         );
+
+                        setNftdIds(nftIds);
+                        
+                        setBalances(tokenQuantities);
+                        setCustomSquareStyles(generateCustomSquareStyles(nftIds, balances))
 
                         setGamePos(
                           convertCustomFenToStandard(

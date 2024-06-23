@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Card, Avatar, Button, Popover, Select, Space } from "antd";
+import {
+  Card,
+  Avatar,
+  Button,
+  Popover,
+  Select,
+  Space,
+  InputNumber,
+} from "antd";
 import { boardNotationToFen } from "../utils";
 
 const pieces = [
@@ -28,7 +36,11 @@ const customPieces = (
   nftIds: any,
   balances: any,
   fetchCells: any,
-  isGameStarted: any
+  isGameStarted: any,
+  whiteBalance: any,
+  blackBalance: any,
+  setQuantityToDeposit: any,
+  quantityToDeposit: any
 ) => {
   const returnPieces: any = {};
   pieces.map((p) => {
@@ -38,13 +50,15 @@ const customPieces = (
         title={"Wrapping " + selectedPiece + " "}
         onOpenChange={() => {
           setSelectedToRide("");
+          setQuantityToDeposit(0);
         }}
         content={
           <>
             <Card
               style={{ width: 350 }}
-              extra={
-                  !isGameStarted && <Space>
+              extra={[
+                !isGameStarted && (
+                  <Space>
                     <Avatar
                       size={50}
                       src={`http://localhost:5173/${selectToRide}.png`}
@@ -104,8 +118,43 @@ const customPieces = (
                     >
                       Ride
                     </Button>
-                  </Space >
-              }
+                  </Space>
+                ),
+                <Space style={{ marginTop: "13px", marginBottom: "13px" }}>
+                  <InputNumber
+                    disabled={Number(balances[selectedPiece]) !== 0}
+                    max={
+                      selectedPiece > 32
+                        ? Number(whiteBalance)
+                        : Number(blackBalance)
+                    }
+                    onChange={(value) => {
+                      setQuantityToDeposit(value);
+                    }}
+                    min={1}
+                    defaultValue={0}
+                  ></InputNumber>
+                  <Button
+                    disabled={false}
+                    onClick={async () => {
+                      console.log(
+                        "deposit",
+                        account,
+                        selectedPiece,
+                        quantityToDeposit
+                      );
+                      const result = await client.actions.assign_tokens({
+                        account,
+                        fenPos: selectedPiece,
+                        tokenQuantity: "100",
+                      });
+                      console.log("result", result);
+                    }}
+                  >
+                    Deposit Tokens
+                  </Button>
+                </Space>,
+              ]}
             >
               <Card.Meta
                 avatar={

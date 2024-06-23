@@ -368,7 +368,7 @@ mod actions {
                 return ();
             }
             
-            let player = get_caller_address();
+            // let player = get_caller_address();
 
             // if board.white_player == player && fenPos > 16 {
             //     return ();
@@ -409,20 +409,20 @@ mod actions {
                 return ();
             }
 
-            let player = get_caller_address();
+            // let player = get_caller_address();
 
-            let mut playerType = PlayerType::White;
-            if fenPos < 32 {
-                playerType = PlayerType::Black;
+            let mut playerType = PlayerType::Black;
+            if fenPos > 32 {
+                playerType = PlayerType::White;
             }
 
             let mut erc20Player = get!(world, playerType, ERC20);
-            if erc20Player.owner != player {
-                return ();
-            }
-            if erc20Player.balance < tokenQuantity {
-                return ();
-            }
+            // if erc20Player.owner != player {
+            //     return ();
+            // }
+            // if erc20Player.balance < tokenQuantity {
+            //     return ();
+            // }
             erc20Player.balance = erc20Player.balance - tokenQuantity;
             set!(world, (erc20Player));
 

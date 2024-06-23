@@ -7,6 +7,15 @@ enum PlayerType {
     Board,
 } 
 
+impl PlayerTypeIntoFelt252 of Into<PlayerType, felt252> {
+    fn into(self: PlayerType) -> felt252 {
+        match self {
+            PlayerType::White => 0,
+            PlayerType::Black => 1,
+            PlayerType::Board => 2,
+        }
+    }
+}
 
 trait TypeTrait {
     fn is_white(self: Type) -> bool;
