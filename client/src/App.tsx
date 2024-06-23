@@ -10,7 +10,7 @@ import { Has, HasValue } from "@dojoengine/recs";
 import { Chess } from "chess.js";
 import customPieces from "./components/customPieces";
 import { boardNotation, chessboardNotation } from "./utils";
-import { Card, Collapse, List, Tag } from "antd";
+import { Card, Collapse, Descriptions, List, message, Tag } from "antd";
 // sha256
 import sha256 from "sha256";
 
@@ -184,6 +184,7 @@ function App() {
   const [balances, setBalances] = useState<any>([]);
   const [customSquareStyles, setCustomSquareStyles] = useState<any>({});
   const [quantityToDeposit, setQuantityToDeposit] = useState<number>(0);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [tokens, setTokens] = useState({
     erc20: { white: 0, black: 0 },
@@ -335,10 +336,9 @@ function App() {
 
       if (Number(balances[index]) > 0) {
         // console.log("balance", balances[index], index);
-        if(customSquareStyles[square]){
+        if (customSquareStyles[square]) {
           customSquareStyles[square].border = "3px solid yellow";
-        }
-        else{
+        } else {
           customSquareStyles[square] = { border: "5px solid yellow" };
         }
       }
@@ -357,7 +357,9 @@ function App() {
 
       setNftdIds(nftIds);
       setBalances(tokenQuantities);
-      setCustomSquareStyles(generateCustomSquareStyles(nftIds, tokenQuantities));
+      setCustomSquareStyles(
+        generateCustomSquareStyles(nftIds, tokenQuantities)
+      );
 
       const tokens = await fetchTokens();
       setTokens(tokens as any);
@@ -412,47 +414,122 @@ function App() {
 
   const board = useComponentValue(Board, playerQuery[0]);
 
+  const descriptionItems = [
+    {
+      key: "1",
+      label: "Product",
+      children: "Cloud Database",
+    },
+    {
+      key: "2",
+      label: "Billing",
+      children: "Prepaid",
+    },
+  ];
+
   return (
     <div className="container mx-auto">
+      {contextHolder}
       <h1 className="text-3xl text-center">Degen Zkhess</h1>
       <button
+        style={{
+          color: "white",
+          backgroundColor: "lightblue",
+          padding: "3px",
+          borderRadius: "5px",
+          marginTop: "10px",
+        }}
         onClick={async () => {
-          await client.actions.spawn({ account });
+          const response = await client.actions.spawn({ account });
           // refresh the page
           // wait 5 seconds
+          messageApi.open({
+            type: "success",
+            content: `Spawned successfully, transaction hash: ${response.transaction_hash}`,
+            duration: 6,
+          });
           setTimeout(() => {
             window.location.reload();
           }, 3000);
         }}
       >
-        spawn
+        Spawn Chessboard
       </button>
       <div className="text-xl py-3">
         {board?.id && (
           <>
-            <div>Board Registered</div>
+            <Descriptions
+              bordered
+              title="Game Info"
+              size={"default"}
+              // extra={<Button type="primary">Edit</Button>}
+              items={[
+                {
+                  key: "1",
+                  label: "Board Id",
+                  children: "1",
+                },
+                {
+                  key: "2",
+                  label: "Is Started",
+                  children: board.is_started ? "Yes" : "No",
+                },
+                {
+                  key: "3",
+                  label: "Is Finished",
+                  children: game.isGameOver() ? "Yes" : "No",
+                },
+                {
+                  key: "4",
+                  label: "Turn",
+                  children: game.turn() == "w" ? "White" : "Black",
+                },
+                {
+                  key: "5",
+                  label: "White Player",
+                  children: "45c4ce9d...ae8a28ec",
+                },
+                {
+                  key: "6",
+                  label: "Black Player",
+                  children: "e51b4a65...f390c229",
+                },
+                {
+                  key: "7",
+                  label: "Winner",
+                  children: game.isGameOver() ? game.turn() === 'b' ? "White" : "Black" : "None",
+                },
+              ]}
+            />
+            {/* <div>Board Registered</div>
             <div>Turn {game.turn()}</div>
             <div>Move {loading ? "loading" : "not loading"}</div>
             <div>Game Started {isGameStarted ? "yes" : "no"}</div>
-            {/* <div>Winner {game.in_checkmate() ? game.turn() : "none"}</div> */}
-            <div>Selected Piece {selectedPiece}</div>
-            <button
-              onClick={async () => {
-                await client.actions.start_game({ account });
-                // refresh the page
-                // wait 5 seconds
-                setTimeout(() => {
-                  window.location.reload();
-                }, 3000);
-              }}
-            >
-              Start Game
-            </button>
-            <br></br>
-
-            <pre>{JSON.stringify(balances, null, 2)}</pre>
+            {/* <div>Winner {game.in_checkmate() ? game.turn() : "none"}</div> 
+            <div>Selected Piece {selectedPiece}</div> */}
 
             <br></br>
+            {!board?.is_started && (
+              <button
+                style={{
+                  color: "white",
+                  backgroundColor: "lightgreen",
+                  padding: "3px",
+                  borderRadius: "5px",
+                  marginTop: "10px",
+                }}
+                onClick={async () => {
+                  await client.actions.start_game({ account });
+                  // refresh the page
+                  // wait 5 seconds
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 3000);
+                }}
+              >
+                Start Game
+              </button>
+            )}
             <br></br>
             <br></br>
           </>
@@ -566,9 +643,10 @@ function App() {
           )}
           <div
             style={{
-              width: "800px",
+              width: "850px",
               height: "100%",
-              marginLeft: "50px",
+              marginLeft: "45px",
+              marginTop: "50px",
             }}
           >
             <Collapse
