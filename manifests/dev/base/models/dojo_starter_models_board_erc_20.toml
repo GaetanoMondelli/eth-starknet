@@ -1,0 +1,30 @@
+kind = "DojoModel"
+class_hash = "0x3be5f9012609ec748335ea03b389b0baed935b2587ebca64b688da1f01c5e9"
+original_class_hash = "0x3be5f9012609ec748335ea03b389b0baed935b2587ebca64b688da1f01c5e9"
+abi = "manifests/dev/abis/base/models/dojo_starter_models_board_erc_20.json"
+name = "dojo_starter::models::board::erc_20"
+
+[[members]]
+name = "addressId"
+type = "u64"
+key = true
+
+[[members]]
+name = "ownerType"
+type = "PlayerType"
+key = false
+
+[[members]]
+name = "id"
+type = "u64"
+key = false
+
+[[members]]
+name = "owner"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "balance"
+type = "u64"
+key = false

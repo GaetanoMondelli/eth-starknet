@@ -1,0 +1,30 @@
+kind = "DojoModel"
+class_hash = "0x439acbe657a2463b348065117c5ab9b3a3640d431c45765e240b8d95f0d05a1"
+original_class_hash = "0x439acbe657a2463b348065117c5ab9b3a3640d431c45765e240b8d95f0d05a1"
+abi = "manifests/dev/abis/base/models/dojo_starter_models_board_erc_721.json"
+name = "dojo_starter::models::board::erc_721"
+
+[[members]]
+name = "nftId"
+type = "u64"
+key = true
+
+[[members]]
+name = "id"
+type = "u64"
+key = false
+
+[[members]]
+name = "owner"
+type = "ContractAddress"
+key = false
+
+[[members]]
+name = "ownerType"
+type = "PlayerType"
+key = false
+
+[[members]]
+name = "attribute"
+type = "u64"
+key = false

@@ -1,0 +1,25 @@
+kind = "DojoModel"
+class_hash = "0x30ff74acafcb6aaa3ad8954234e74511204c2c3f6c759e9f46b29bee00e85cf"
+original_class_hash = "0x30ff74acafcb6aaa3ad8954234e74511204c2c3f6c759e9f46b29bee00e85cf"
+abi = "manifests/dev/abis/base/models/dojo_starter_models_board_cell.json"
+name = "dojo_starter::models::board::cell"
+
+[[members]]
+name = "fenPos"
+type = "u64"
+key = true
+
+[[members]]
+name = "value"
+type = "Type"
+key = false
+
+[[members]]
+name = "nftRideId"
+type = "u64"
+key = false
+
+[[members]]
+name = "tokenQuantity"
+type = "u64"
+key = false

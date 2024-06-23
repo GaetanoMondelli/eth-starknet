@@ -432,15 +432,15 @@ mod actions {
             // if erc20Player.owner != player {
             //     return ();
             // }
-            // if erc20Player.balance < tokenQuantity {
-            //     return ();
-            // }
+            if erc20Player.balance < tokenQuantity {
+                return ();
+            }
             erc20Player.balance = erc20Player.balance - tokenQuantity;
             set!(world, (erc20Player));
 
-            // let mut cell = get!(world, fenPos, Cell);
-            // cell.tokenQuantity = tokenQuantity;
-            // set!(world, (cell));
+            let mut cell = get!(world, fenPos, Cell);
+            cell.tokenQuantity = tokenQuantity;
+            set!(world, (cell));
         }
 
         fn startGame(ref world: IWorldDispatcher) {
