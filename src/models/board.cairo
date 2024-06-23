@@ -177,7 +177,7 @@ struct ERC20 {
 struct ERC721 {
     #[key]
     nftId: u64,
-    // #[key]
+    #[key]
     id: u64,
     // #[key]
     owner: ContractAddress,

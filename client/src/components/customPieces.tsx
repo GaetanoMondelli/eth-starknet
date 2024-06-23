@@ -41,7 +41,8 @@ const customPieces = (
   whiteBalance: any,
   blackBalance: any,
   setQuantityToDeposit: any,
-  quantityToDeposit: any
+  quantityToDeposit: any,
+  messageApi: any
 ) => {
   const returnPieces: any = {};
   pieces.map((p) => {
@@ -110,11 +111,19 @@ const customPieces = (
                           fenPos: selectedPiece,
                           nftRideId: Number(selectToRide),
                         });
-                        client.actions.ride_piece({
+                        const result = await client.actions.ride_piece({
                           account,
                           fenPos: selectedPiece,
                           nftRideId: Number(selectToRide),
                         });
+                        await messageApi.open({
+                          type: "success",
+                          content: `Piece ridden by NFT successfully, transaction hash: ${result.transaction_hash}`,
+                          duration: 2,
+                        });
+                        // reload the web page
+                        window.location.reload();
+                        
                       }}
                     >
                       Ride
@@ -150,6 +159,13 @@ const customPieces = (
                           fenPos: selectedPiece,
                           tokenQuantity: quantityToDeposit,
                         });
+                        await messageApi.open({
+                          type: "success",
+                          content: `Tokens deposited successfully, transaction hash: ${result.transaction_hash}`,
+                          duration: 2,
+                        });
+                        // reload the web page
+                        window.location.reload();
                         console.log("result", result);
                       }}
                     >

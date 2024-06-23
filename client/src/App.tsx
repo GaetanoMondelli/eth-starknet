@@ -13,6 +13,7 @@ import { boardNotation, chessboardNotation } from "./utils";
 import { Card, Collapse, Descriptions, List, message, Tag } from "antd";
 // sha256
 import sha256 from "sha256";
+import Confetti from "react-confetti";
 
 function chessPositionToIndex(pos) {
   // Extract the column (letter) and row (number)
@@ -414,23 +415,11 @@ function App() {
 
   const board = useComponentValue(Board, playerQuery[0]);
 
-  const descriptionItems = [
-    {
-      key: "1",
-      label: "Product",
-      children: "Cloud Database",
-    },
-    {
-      key: "2",
-      label: "Billing",
-      children: "Prepaid",
-    },
-  ];
-
   return (
     <div className="container mx-auto">
       {contextHolder}
-      <h1 className="text-3xl text-center">Degen Zkhess</h1>
+      <Confetti run={game.isGameOver()} width={2600} height={2000} />
+      <h1 className="text-3xl text-center">♞ Degen Zkhess ♗</h1>
       <button
         style={{
           color: "white",
@@ -441,8 +430,6 @@ function App() {
         }}
         onClick={async () => {
           const response = await client.actions.spawn({ account });
-          // refresh the page
-          // wait 5 seconds
           messageApi.open({
             type: "success",
             content: `Spawned successfully, transaction hash: ${response.transaction_hash}`,
@@ -482,7 +469,34 @@ function App() {
                 {
                   key: "4",
                   label: "Turn",
-                  children: game.turn() == "w" ? "White" : "Black",
+                  children:
+                    game.turn() == "w" ? (
+                      <>
+                        White
+                        <span
+                          style={{
+                            color: "black",
+                            fontSize: "2em",
+                            marginLeft: "5px",
+                          }}
+                        >
+                          ♘
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        Black
+                        <span
+                          style={{
+                            color: "black",
+                            fontSize: "2em",
+                            marginLeft: "5px",
+                          }}
+                        >
+                          ♛
+                        </span>
+                      </>
+                    ),
                 },
                 {
                   key: "5",
@@ -497,7 +511,11 @@ function App() {
                 {
                   key: "7",
                   label: "Winner",
-                  children: game.isGameOver() ? game.turn() === 'b' ? "White" : "Black" : "None",
+                  children: game.isGameOver()
+                    ? game.turn() === "b"
+                      ? "White"
+                      : "Black"
+                    : "None",
                 },
               ]}
             />
@@ -519,9 +537,14 @@ function App() {
                   marginTop: "10px",
                 }}
                 onClick={async () => {
-                  await client.actions.start_game({ account });
+                  const response = await client.actions.start_game({ account });
                   // refresh the page
                   // wait 5 seconds
+                  messageApi.open({
+                    type: "success",
+                    content: `Game Started successfully, transaction hash: ${response.transaction_hash}`,
+                    duration: 6,
+                  });
                   setTimeout(() => {
                     window.location.reload();
                   }, 3000);
@@ -572,7 +595,8 @@ function App() {
                   tokens.erc20.white,
                   tokens.erc20.black,
                   setQuantityToDeposit,
-                  quantityToDeposit
+                  quantityToDeposit,
+                  messageApi
                 )}
                 onPieceDrop={(from, to) => {
                   console.log("move", from, to);
@@ -599,6 +623,11 @@ function App() {
                     })
                     .then(async (res) => {
                       console.log("Piece moved successfully", res);
+                      messageApi.open({
+                        type: "success",
+                        content: `Piece moved successfully, transaction hash: ${res.transaction_hash}`,
+                        duration: 6,
+                      });
                       setLoading(true);
                       // Delay before fetching cells
                       setTimeout(async () => {
@@ -680,7 +709,10 @@ function App() {
                         <br></br>
                         Balance:{" "}
                         <Tag style={{ fontSize: 20 }} color="green">
-                          {BigInt(tokens.erc20.white).toString()}
+                          {Number(BigInt(tokens.erc20.white).toString()) +
+                            (game.isGameOver() && game.turn() === "b"
+                              ? 10000
+                              : 0)}
                         </Tag>
                       </Card>
                       <h2>ERC721</h2>
@@ -755,7 +787,10 @@ function App() {
                         <br></br>
                         Balance:{" "}
                         <Tag style={{ fontSize: 20 }} color="green">
-                          {BigInt(tokens.erc20.black).toString()}
+                          {Number(BigInt(tokens.erc20.black).toString()) +
+                            (game.isGameOver() && game.turn() === "w"
+                              ? 10000
+                              : 0)}
                         </Tag>
                       </Card>
                       <h2>ERC721</h2>

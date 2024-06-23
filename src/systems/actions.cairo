@@ -188,110 +188,107 @@ mod actions {
             let mut cell_to = get!(world, to, Cell);
 
 
-            // if cell_from.value.is_empty(){
-            //     return ();
-            // }
+            if cell_from.value.is_empty(){
+                return ();
+            }
 
-            // if board.turn == false && cell_from.value.is_white() {
-            //     return ();
-            // }
+            if board.turn == false && cell_from.value.is_white() {
+                return ();
+            }
 
-            // if board.turn == true && cell_from.value.is_black() {
-            //     return ();
-            // }
+            if board.turn == true && cell_from.value.is_black() {
+                return ();
+            }
 
-            // if to > 63 {
-            //     return ();
-            // }
+            if to > 63 {
+                return ();
+            }
 
-            // if cell_from.value.is_pawn() {
-            //     if cell_from.value.is_white() {
-            //         if (to > from) && (to - from) == 8 {
-            //             cell_to.value = cell_from.value;
-            //             cell_from.value = Type::Empty;
-            //         } else if (to - from) == 16 && cell_from.fenPos < 16 {
-            //             cell_to.value = cell_from.value;
-            //             cell_from.value = Type::Empty;
-            //         } else {
-            //             return ();
-            //         }
-            //     } else {
-            //         if (from > to) && (from - to) == 8 {
-            //             cell_to.value = cell_from.value;
-            //             cell_from.value = Type::Empty;
-            //         } else if (from > to) && (from - to) == 16 && cell_from.fenPos > 47 {
-            //             cell_to.value = cell_from.value;
-            //             cell_from.value = Type::Empty;
-            //         } else {
-            //             return ();
-            //         }
-            //     }
-            // } 
+            if cell_from.value.is_pawn() {
+                if cell_from.value.is_white() {
+                    if (to > from) && (to - from) == 8 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else if (to - from) == 16 && cell_from.fenPos < 16 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else {
+                        return ();
+                    }
+                } else {
+                    if (from > to) && (from - to) == 8 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else if (from > to) && (from - to) == 16 && cell_from.fenPos > 47 {
+                        cell_to.value = cell_from.value;
+                        cell_from.value = Type::Empty;
+                    } else {
+                        return ();
+                    }
+                }
+            } 
 
-            // if cell_from.value.is_rook() {
-            //     if (from / 8 == to / 8) || (from % 8 == to % 8) {
-            //         cell_to.value = cell_from.value;
-            //         cell_from.value = Type::Empty;
-            //     } else {
-            //         return ();
-            //     }
-            // }
+            if cell_from.value.is_rook() {
+                if (from / 8 == to / 8) || (from % 8 == to % 8) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
 
-            // if cell_from.value.is_bishop() {
-            //     if (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
-            //         || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
-            //         cell_to.value = cell_from.value;
-            //         cell_from.value = Type::Empty;
-            //     } else {
-            //         return ();
-            //     }
-            // }
-
-
-            // if cell_from.value.is_knight() {
-            //     if (from / 8 == to / 8 + 2 && from % 8 == to % 8 + 1) 
-            //         || (from / 8 == to / 8 + 2 && from % 8 == to % 8 - 1) 
-            //         || (from / 8 == to / 8 - 2 && from % 8 == to % 8 + 1) 
-            //         || (from / 8 == to / 8 - 2 && from % 8 == to % 8 - 1) 
-            //         || (from / 8 == to / 8 + 1 && from % 8 == to % 8 + 2) 
-            //         || (from / 8 == to / 8 + 1 && from % 8 == to % 8 - 2) 
-            //         || (from / 8 == to / 8 - 1 && from % 8 == to % 8 + 2) 
-            //         || (from / 8 == to / 8 - 1 && from % 8 == to % 8 - 2) {
-            //         cell_to.value = cell_from.value;
-            //         cell_from.value = Type::Empty;
-            //     } else {
-            //         return ();
-            //     }
-            // }
+            if cell_from.value.is_bishop() {
+                if (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
+                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
 
 
-            // if cell_from.value.is_queen() {
-            //     if (from / 8 == to / 8) || (from % 8 == to % 8) 
-            //         || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
-            //         || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
-            //         cell_to.value = cell_from.value;
-            //         cell_from.value = Type::Empty;
-            //     } else {
-            //         // !!! check the inverse diagonal works
-            //         return ();
-            //     }
-            // }
-
-            // if cell_from.value.is_king() {
-            //     if (from / 8 == to / 8 && (from % 8 == to % 8 + 1 || from % 8 == to % 8 - 1)) 
-            //         || (from % 8 == to % 8 && (from / 8 == to / 8 + 1 || from / 8 == to / 8 - 1)) 
-            //         || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8) && (from / 8 - to / 8 == 1 || from % 8 - to % 8 == 1)) 
-            //         || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8) && (to / 8 - from / 8 == 1 || to % 8 - from % 8 == 1)) {
-            //         cell_to.value = cell_from.value;
-            //         cell_from.value = Type::Empty;
-            //     } else {
-            //         return ();
-            //     }
-            // }
+            if cell_from.value.is_knight() {
+                if (from / 8 == to / 8 + 2 && from % 8 == to % 8 + 1) 
+                    || (from / 8 == to / 8 + 2 && from % 8 == to % 8 - 1) 
+                    || (from / 8 == to / 8 - 2 && from % 8 == to % 8 + 1) 
+                    || (from / 8 == to / 8 - 2 && from % 8 == to % 8 - 1) 
+                    || (from / 8 == to / 8 + 1 && from % 8 == to % 8 + 2) 
+                    || (from / 8 == to / 8 + 1 && from % 8 == to % 8 - 2) 
+                    || (from / 8 == to / 8 - 1 && from % 8 == to % 8 + 2) 
+                    || (from / 8 == to / 8 - 1 && from % 8 == to % 8 - 2) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
 
 
+            if cell_from.value.is_queen() {
+                if (from / 8 == to / 8) || (from % 8 == to % 8) 
+                    || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8)) 
+                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8)) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    // !!! check the inverse diagonal works
+                    return ();
+                }
+            }
+
+            if cell_from.value.is_king() {
+                if (from / 8 == to / 8 && (from % 8 == to % 8 + 1 || from % 8 == to % 8 - 1)) 
+                    || (from % 8 == to % 8 && (from / 8 == to / 8 + 1 || from / 8 == to / 8 - 1)) 
+                    || (from > to && (from / 8 - to / 8) == (from % 8 - to % 8) && (from / 8 - to / 8 == 1 || from % 8 - to % 8 == 1)) 
+                    || (from < to && (to / 8 - from / 8) == (to % 8 - from % 8) && (to / 8 - from / 8 == 1 || to % 8 - from % 8 == 1)) {
+                    cell_to.value = cell_from.value;
+                    cell_from.value = Type::Empty;
+                } else {
+                    return ();
+                }
+            }
             
-            // UNCOMMENT FOR REMOVING CONSTRAINTS
             let toPiece = cell_to.value;
             let nftCaptureId = cell_to.nftRideId;
             let tokenQuantity = cell_to.tokenQuantity;
@@ -324,10 +321,6 @@ mod actions {
             }
 
             if tokenQuantity != 0 {
-                // let mut playerType = PlayerType::White;
-                // if board.turn == true {
-                //     playerType = PlayerType::Black;
-                // }
                 let mut addressId = 0;
                 if board.turn == true {
                     addressId = 1;
@@ -337,6 +330,16 @@ mod actions {
                 set!(world, (erc20Player));
             }
 
+            if toPiece.is_king() {
+                let mut addressId = 0;
+                if board.turn == true {
+                    addressId = 1;
+                }
+                let mut erc20Player = get!(world, addressId, ERC20);
+                // WINNER GETS 10000 TOKENS
+                erc20Player.balance = erc20Player.balance + 10000;
+                set!(world, (erc20Player));
+            }
 
             if board.turn == false {
                 set!(world, (
@@ -374,15 +377,15 @@ mod actions {
                 return ();
             }
             
-            // let player = get_caller_address();
+            let player = get_caller_address();
 
-            // if board.white_player == player && fenPos > 16 {
-            //     return ();
-            // }
+            if board.white_player == player && fenPos > 16 {
+                return ();
+            }
 
-            // if board.black_player == player && fenPos < 47 {
-            //     return ();
-            // }
+            if board.black_player == player && fenPos < 47 {
+                return ();
+            }
 
             let mut playerType = PlayerType::Black;
             if fenPos > 32 {
@@ -391,9 +394,9 @@ mod actions {
 
             // check the nft belongs to the player
             let mut nft = get!(world, nftRideId, ERC721);
-            // if nft.owner != player {
-            //     return ();
-            // }
+            if nft.owner != player {
+                return ();
+            }
 
             let mut cell = get!(world, fenPos, Cell);
             cell.nftRideId = nftRideId;
@@ -407,15 +410,15 @@ mod actions {
 
         fn assign_tokens(ref world: IWorldDispatcher, fenPos: u64, tokenQuantity: u64) {
             let board = get!(world, 1, Board);
-            // if board.is_started == true {
-            //     return ();
-            // }
+            if board.is_started == true {
+                return ();
+            }
 
-            // if board.is_finished {
-            //     return ();
-            // }
+            if board.is_finished {
+                return ();
+            }
 
-            // let player = get_caller_address();
+            let player = get_caller_address();
 
             let mut playerType = PlayerType::Black;
             if fenPos > 32 {
